@@ -47,7 +47,7 @@ class UserLogin(APIView):
                 raise PasswordError
 
         if account_type == "team":
-            team = Team.objects.filter(username=username,password=password)
+            team = Team.objects.get(username=username,password=password)
             if team.exists():
                 payload = {"type":"team","username":username,"name":team.name}
                 token = create_jwt(payload)
@@ -56,7 +56,7 @@ class UserLogin(APIView):
                 raise PasswordError
 
         if account_type == "referee":
-            referee = Referee.objects.filter(username=username,password=password)
+            referee = Referee.objects.get(username=username,password=password)
             if referee.exists():
                 payload = {"type": account_type, "username": username, "name": referee.name}
                 token = create_jwt(payload)
