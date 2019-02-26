@@ -1,0 +1,7 @@
+*.sqlite3
+config.ini
+__pycache__/
+/logs
+/captcha.png
+/temp.py
+.idea
