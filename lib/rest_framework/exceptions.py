@@ -11,6 +11,10 @@ class BadRequest(APIException):
     status_code = 400
     default_detail = 'Parameter format error'
 
+class PermissionDeny(APIException):
+    status_code = 403
+    default_detail = 'Permission Deny'
+
 class PasswordError(APIException):
     status_code = 422
     default_detail = "Username or Password error"

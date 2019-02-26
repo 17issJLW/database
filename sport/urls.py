@@ -6,5 +6,6 @@ from database_project import settings
 
 urlpatterns = [
     path('login/', UserLogin.as_view(), name="UserLogin"),
+    path('team/', TeamView.as_view(), name="TeamView"),
 
 ]
