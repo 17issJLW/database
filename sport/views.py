@@ -14,21 +14,17 @@ class UserLogin(APIView):
         type = request.META.get("REMOTE_USER").get("type")
         username = request.META.get("REMOTE_USER").get("username")
         if type == "team":
-            queryset = Team.objects.get(username=username)
+            queryset = Team.objects.filter(username=username).first()
             serializer = TeamSerializer(queryset)
             return Response(serializer.data)
 
         if type == "referee":
-            queryset = Referee.objects.get(username=username)
+            queryset = Referee.objects.filter(username=username).first()
             serializer = RefereeSerializer(queryset)
             return Response(serializer.data)
 
         if type == "admin":
             return Response({"username":"admin","type":"admin"})
-
-
-
-
 
 
     def post(self,request):
@@ -47,8 +43,8 @@ class UserLogin(APIView):
                 raise PasswordError
 
         if account_type == "team":
-            team = Team.objects.get(username=username,password=password)
-            if team.exists():
+            team = Team.objects.filter(username=username,password=password).first()
+            if team:
                 payload = {"type":"team","username":username,"name":team.name}
                 token = create_jwt(payload)
                 return Response({"token": token, "username": username, "name": team.name}, status=status.HTTP_200_OK)
@@ -56,8 +52,8 @@ class UserLogin(APIView):
                 raise PasswordError
 
         if account_type == "referee":
-            referee = Referee.objects.get(username=username,password=password)
-            if referee.exists():
+            referee = Referee.objects.filter(username=username,password=password).first()
+            if referee:
                 payload = {"type": account_type, "username": username, "name": referee.name}
                 token = create_jwt(payload)
                 return Response({"token": token, "username": username, "name": referee.name}, status=status.HTTP_200_OK)
