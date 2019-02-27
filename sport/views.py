@@ -93,7 +93,7 @@ class TeamView(APIView):
         if type != "admin":
             raise PermissionDeny
         serializer = TeamSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             data = serializer.validated_data
             team = Team.objects.create(
                 username=data.get("username"),
@@ -103,6 +103,20 @@ class TeamView(APIView):
             return Response({"username":team.username,"password":team.password,"name":team.username},status=status.HTTP_201_CREATED)
         else:
             raise BadRequest
+
+    @check_token
+    def delete(self, request):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        request_data = request.data
+        team = Team.objects.filter(pk=request_data.get("id")).first()
+        if team:
+            serializer = TeamSerializer(team)
+            team.delete()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            raise TeamNotFound
 
 
 

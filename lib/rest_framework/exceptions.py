@@ -3,9 +3,9 @@ from rest_framework.exceptions import APIException
 """
 自定义异常，自定义个类，继承自APIException，并设置.status_code和.default_detail属性
 """
-class CourseNotFound(APIException):
+class TeamNotFound(APIException):
     status_code = 404
-    default_detail = 'Course not found'
+    default_detail = 'Team not found'
 
 class BadRequest(APIException):
     status_code = 400

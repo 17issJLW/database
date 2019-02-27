@@ -11,6 +11,7 @@ class Team(models.Model):
     class Meta:
         verbose_name = '代表队表'
         verbose_name_plural = '代表队表'
+        ordering = ['id',]
 
     def __str__(self):
         return '%s %s' % (self.username, self.name)
