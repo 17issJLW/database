@@ -8,9 +8,9 @@ from .models import *
 from .serializers import *
 # Create your views here.
 
-class TeamPagination(PageNumberPagination):
+class Pagination(PageNumberPagination):
     """
-    配置课程列表分页规则
+    配置分页规则
     """
     page_size = 20                          #每页显示数目
     page_size_query_param = 'size'          #控制每页显示数目的参数
@@ -82,7 +82,7 @@ class TeamView(APIView):
             raise PermissionDeny
 
         queryset = Team.objects.all()
-        page = TeamPagination()
+        page = Pagination()
         result = page.paginate_queryset(queryset=queryset,request=request,view=self)
         serializer = TeamSerializer(result,many=True)
         return page.get_paginated_response(serializer.data)
@@ -105,18 +105,84 @@ class TeamView(APIView):
             raise BadRequest
 
     @check_token
-    def delete(self, request):
+    def put(self,request,team_id):
         type = request.META.get("REMOTE_USER").get("type")
         if type != "admin":
             raise PermissionDeny
-        request_data = request.data
-        team = Team.objects.filter(pk=request_data.get("id")).first()
+        team = Team.objects.filter(pk=team_id).first()
+        if team:
+            serializer = TeamSerializer(team,data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            raise TeamNotFound
+
+    @check_token
+    def delete(self, request,team_id):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        team = Team.objects.filter(pk=team_id).first()
         if team:
             serializer = TeamSerializer(team)
             team.delete()
             return Response(serializer.data,status=status.HTTP_200_OK)
         else:
             raise TeamNotFound
+
+
+class CompetitionView(APIView):
+
+    @check_token
+    def get(self,request):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        queryset = Competition.objects.all()
+        page = Pagination()
+        result = page.paginate_queryset(queryset=queryset,request=request,view=self)
+        serializer = TeamSerializer(result,many=True)
+        return page.get_paginated_response(serializer.data)
+
+    @check_token
+    def post(self,request):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        serializer = CompetitionSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            raise BadRequest
+
+    @check_token
+    def put(self,request,competition_id):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        competition = Competition.objects.filter(pk=competition_id).first()
+        if competition:
+            serializer = CompetitionSerializer(competition,data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            raise NotFound
+
+    @check_token
+    def delete(self, request,competition_id):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        competition = Competition.objects.filter(pk=competition_id).first()
+        if competition:
+            serializer = CompetitionSerializer(competition)
+            competition.delete()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            raise NotFound
 
 
 

@@ -6,6 +6,9 @@ from rest_framework.exceptions import APIException
 class TeamNotFound(APIException):
     status_code = 404
     default_detail = 'Team not found'
+class NotFound(APIException):
+    status_code = 404
+    default_detail = 'Not found'
 
 class BadRequest(APIException):
     status_code = 400
