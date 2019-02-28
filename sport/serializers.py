@@ -26,3 +26,10 @@ class CompetitionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("比赛项目和性别不符")
 
         return attrs
+
+class LeaderAndDoctorSerializer(serializers.ModelSerializer):
+    team = serializers.ReadOnlyField()
+
+    class Meta:
+        model = LeaderAndDoctor
+        fields = "__all__"

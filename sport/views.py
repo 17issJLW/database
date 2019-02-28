@@ -1,7 +1,7 @@
 from lib.rest_framework.exceptions import *
 from rest_framework.views import APIView, status,Response
 from lib.rest_framework.util import *
-from lib.rest_framework.permissions import check_token
+from lib.rest_framework.permissions import check_token,check_team_token
 from rest_framework.pagination import PageNumberPagination
 
 from .models import *
@@ -186,3 +186,48 @@ class CompetitionView(APIView):
 
 
 
+class LeaderAndDoctorView(APIView):
+
+    @check_team_token
+    def get(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        queryset = LeaderAndDoctor.objects.filter(team__username=username)
+        page = Pagination()
+        result = page.paginate_queryset(queryset=queryset, request=request, view=self)
+        serializer = LeaderAndDoctorSerializer(result, many=True)
+        return page.get_paginated_response(serializer.data)
+
+    @check_team_token
+    def post(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        serializer = LeaderAndDoctorSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            raise BadRequest
+
+    @check_team_token
+    def put(self, request, people_id):
+        username = request.META.get("REMOTE_USER").get("username")
+        people = LeaderAndDoctor.objects.filter(pk=people_id).first()
+        if people:
+            serializer = LeaderAndDoctorSerializer(people, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise NotFound
+
+    @check_token
+    def delete(self, request, competition_id):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        competition = Competition.objects.filter(pk=competition_id).first()
+        if competition:
+            serializer = CompetitionSerializer(competition)
+            competition.delete()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise NotFound

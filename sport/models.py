@@ -5,7 +5,7 @@ from django.db import models
 class Team(models.Model):
     username = models.CharField(verbose_name="账号",max_length=32,unique=True,default="")
     password = models.CharField(verbose_name="密码", max_length=32,default='')
-    name = models.CharField(verbose_name="代表队队名",max_length=32)
+    name = models.CharField(verbose_name="代表队队名",max_length=32,blank=True,null=True)
     file = models.FileField(upload_to='file/',default="file/default")
 
     class Meta:

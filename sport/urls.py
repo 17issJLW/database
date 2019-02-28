@@ -17,6 +17,8 @@ urlpatterns = [
     path('team/<int:team_id>/', TeamView.as_view(), name="TeamView"),
     path('competition/', CompetitionView.as_view(), name="CompetitionView"),
     path('competition/<int:competition_id>/', CompetitionView.as_view(), name="CompetitionView"),
+    path('leader_doctor/', LeaderAndDoctorView.as_view(), name="LeaderAndDoctorView"),
+    path('leader_doctor/<int:people_id>/', LeaderAndDoctorView.as_view(), name="LeaderAndDoctorView"),
 
 
 ]
