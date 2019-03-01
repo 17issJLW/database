@@ -242,3 +242,59 @@ class LeaderAndDoctorView(APIView):
         else:
             raise NotFound
 
+
+class CoachView(APIView):
+
+    @check_team_token
+    def get(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        queryset = Coach.objects.filter(team__username=username)
+        page = Pagination()
+        result = page.paginate_queryset(queryset=queryset, request=request, view=self)
+        serializer = CoachSerializer(result, many=True)
+        return page.get_paginated_response(serializer.data)
+
+    @check_team_token
+    def post(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        try:
+            team = Team.objects.get(username=username)
+        except:
+            raise NotFound
+        serializer = CoachSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            data = serializer.validated_data
+            coach = Coach.objects.create(
+                name=data.get("name"),
+                id_number=data.get("id_number"),
+                phone=data.get("phone"),
+                team=team
+            )
+            serializer = CoachSerializer(coach)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            raise BadRequest
+
+    @check_team_token
+    def put(self, request, people_id):
+        username = request.META.get("REMOTE_USER").get("username")
+        coach = Coach.objects.filter(pk=people_id).first()
+        if coach:
+            serializer = CoachSerializer(coach, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise NotFound
+
+    @check_token
+    def delete(self, request, people_id):
+        username = request.META.get("REMOTE_USER").get("username")
+        coach = Coach.objects.filter(pk=people_id, team__username=username).first()
+        if coach:
+            serializer = CoachSerializer(coach)
+            coach.delete()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise NotFound
+

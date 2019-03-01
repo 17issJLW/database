@@ -36,4 +36,4 @@ admin.site.register(Group)
 admin.site.register(Coach)
 #
 admin.site.register(SportManGroup)
-admin.site.register(CoachGroup)
+admin.site.register(RefereeGroup)

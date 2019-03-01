@@ -34,3 +34,10 @@ class LeaderAndDoctorSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaderAndDoctor
         fields = "__all__"
+
+class CoachSerializer(serializers.ModelSerializer):
+    team_name = serializers.ReadOnlyField(source="team.name")
+
+    class Meta:
+        model = LeaderAndDoctor
+        fields = "__all__"
