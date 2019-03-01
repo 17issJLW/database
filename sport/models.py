@@ -5,7 +5,7 @@ from django.db import models
 class Team(models.Model):
     username = models.CharField(verbose_name="账号",max_length=32,unique=True,default="")
     password = models.CharField(verbose_name="密码", max_length=32,default='')
-    name = models.CharField(verbose_name="代表队队名",max_length=32,blank=True,null=True)
+    name = models.CharField(verbose_name="代表队队名",max_length=32,default='', unique=True)
     file = models.FileField(upload_to='file/',default="file/default")
 
     class Meta:
@@ -126,9 +126,14 @@ class Coach(models.Model):
         return '%s %s ' % (self.name, self.team.name)
 
 class LeaderAndDoctor(models.Model):
+    PLACE=(
+        ("领队", "领队"),
+        ("队医", "队医"),
+    )
     name = models.CharField(verbose_name="姓名", max_length=32, db_index=True)
     id_number = models.CharField(verbose_name="身份证号码", max_length=18, default="", unique=True)
     phone = models.CharField(verbose_name="手机号码", max_length=32, default="")
+    place = models.CharField(verbose_name="职位",max_length=32,choices=PLACE,default="领队")
     team = models.ForeignKey("Team", verbose_name="所属代表队", blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:

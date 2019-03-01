@@ -200,9 +200,21 @@ class LeaderAndDoctorView(APIView):
     @check_team_token
     def post(self,request):
         username = request.META.get("REMOTE_USER").get("username")
+        try:
+            team = Team.objects.get(username=username)
+        except:
+            raise NotFound
         serializer = LeaderAndDoctorSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            data = serializer.validated_data
+            people = LeaderAndDoctor.objects.create(
+                name=data.get("name"),
+                id_number=data.get("id_number"),
+                phone=data.get("phone"),
+                place=data.get("place"),
+                team=team
+            )
+            serializer = LeaderAndDoctorSerializer(people)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             raise BadRequest
@@ -220,14 +232,13 @@ class LeaderAndDoctorView(APIView):
             raise NotFound
 
     @check_token
-    def delete(self, request, competition_id):
-        type = request.META.get("REMOTE_USER").get("type")
-        if type != "admin":
-            raise PermissionDeny
-        competition = Competition.objects.filter(pk=competition_id).first()
-        if competition:
-            serializer = CompetitionSerializer(competition)
-            competition.delete()
+    def delete(self, request, people_id):
+        username = request.META.get("REMOTE_USER").get("username")
+        people = LeaderAndDoctor.objects.filter(pk=people_id, team__username=username).first()
+        if people:
+            serializer = LeaderAndDoctorSerializer(people)
+            people.delete()
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             raise NotFound
+

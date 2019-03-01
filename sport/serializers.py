@@ -28,7 +28,8 @@ class CompetitionSerializer(serializers.ModelSerializer):
         return attrs
 
 class LeaderAndDoctorSerializer(serializers.ModelSerializer):
-    team = serializers.ReadOnlyField()
+    # team = serializers.ReadOnlyField()
+    team_name = serializers.ReadOnlyField(source="team.name")
 
     class Meta:
         model = LeaderAndDoctor
