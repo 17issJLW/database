@@ -86,7 +86,6 @@ CORS_ALLOW_HEADERS = (
     'x-csrftoken',
     'x-requested-with',
     'token',
-    'Token',
 )
 
 ROOT_URLCONF = 'database_project.urls'
