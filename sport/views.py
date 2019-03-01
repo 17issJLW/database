@@ -142,7 +142,7 @@ class CompetitionView(APIView):
         queryset = Competition.objects.all()
         page = Pagination()
         result = page.paginate_queryset(queryset=queryset,request=request,view=self)
-        serializer = TeamSerializer(result,many=True)
+        serializer = CompetitionSerializer(result,many=True)
         return page.get_paginated_response(serializer.data)
 
     @check_token

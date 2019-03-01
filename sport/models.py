@@ -39,7 +39,7 @@ class Competition(models.Model):
         ("9-10","9-10"),
         ("11-12", "11-12"),
 
-    )
+     )
     name = models.CharField(max_length=32, choices=NAME_CHOICE)
     sex = models.CharField(verbose_name="性别",default="男", max_length=32, choices=SEX)
     age_group = models.CharField(verbose_name="年龄",default="7-8", max_length=32, choices=AGEGROUP)
