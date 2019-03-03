@@ -27,4 +27,7 @@ urlpatterns = [
     path('group/', GroupView.as_view(), name="GroupView"),
     path('group/<int:group_id>/', GroupView.as_view(), name="GroupView"),
 
+    path('referee/', RefereeView.as_view(), name="RefereeView"),
+    path('referee/<int:people_id>/', RefereeView.as_view(), name="RefereeView"),
+
 ]

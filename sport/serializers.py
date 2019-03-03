@@ -8,6 +8,7 @@ class TeamSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class RefereeSerializer(serializers.ModelSerializer):
+    team_name = serializers.ReadOnlyField(source="team.name")
 
     class Meta:
         model = Referee

@@ -295,7 +295,7 @@ class LeaderAndDoctorView(APIView):
     @check_team_token
     def put(self, request, people_id):
         username = request.META.get("REMOTE_USER").get("username")
-        people = LeaderAndDoctor.objects.filter(pk=people_id).first()
+        people = LeaderAndDoctor.objects.filter(pk=people_id,team__username=username).first()
         if people:
             serializer = LeaderAndDoctorSerializer(people, data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -371,3 +371,59 @@ class CoachView(APIView):
         else:
             raise NotFound
 
+class RefereeView(APIView):
+
+    @check_team_token
+    def get(self, request):
+        username = request.META.get("REMOTE_USER").get("username")
+        queryset = Referee.objects.filter(team__username=username)
+        page = Pagination()
+        result = page.paginate_queryset(queryset=queryset, request=request, view=self)
+        serializer = RefereeSerializer(result, many=True)
+        return page.get_paginated_response(serializer.data)
+
+    @check_team_token
+    def post(self, request):
+        username = request.META.get("REMOTE_USER").get("username")
+        try:
+            team = Team.objects.get(username=username)
+        except:
+            raise NotFound
+        serializer = RefereeSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            data = serializer.validated_data
+            referee = Referee.objects.create(
+                username=data.get("username"),
+                password=data.get("password"),
+                name=data.get("name"),
+                id_number=data.get("id_number"),
+                phone=data.get("phone"),
+                team=team
+            )
+            serializer = RefereeSerializer(referee)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            raise BadRequest
+
+    @check_team_token
+    def put(self, request, people_id):
+        username = request.META.get("REMOTE_USER").get("username")
+        referee = Referee.objects.filter(pk=people_id,team__username=username).first()
+        if referee:
+            serializer = RefereeSerializer(referee, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise NotFound
+
+    @check_token
+    def delete(self, request, people_id):
+        username = request.META.get("REMOTE_USER").get("username")
+        referee = Referee.objects.filter(pk=people_id, team__username=username).first()
+        if referee:
+            serializer = RefereeSerializer(referee)
+            referee.delete()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise NotFound
