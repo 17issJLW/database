@@ -71,8 +71,8 @@ class SportMan(models.Model):
     sex = models.CharField(verbose_name="性别", max_length=32, default="男", choices=SEX)
     age_group = models.CharField(verbose_name="组别",default="7-8岁",choices=AGEGROUP,max_length=32)
     grade = models.FloatField(verbose_name="文化分数", blank=True, null=True)
-    team = models.ForeignKey("Team", verbose_name="所属代表队",blank=True,null=True,on_delete=models.SET_NULL)
-    competition_group = models.ManyToManyField("Group", verbose_name="报名分组", through='SportManGroup', through_fields=("sid", "gid"))
+    team = models.ForeignKey("Team", verbose_name="所属代表队",blank=True,null=True,on_delete=models.SET_NULL,related_name='sport_man_team')
+    competition_group = models.ManyToManyField("Group", verbose_name="报名分组", through='SportManGroup', through_fields=("sid", "gid"), related_name='sport_man')
 
     # phone = models.CharField(verbose_name="手机号码", max_length=32,blank=True, null=True)
     # team = models.ForeignKey("Team",blank=True, null=True,on_delete=models.SET_NULL)
@@ -95,8 +95,8 @@ class Referee(models.Model):
     name = models.CharField(verbose_name="姓名", max_length=32, db_index=True)
     id_number = models.CharField(verbose_name="身份证号码", max_length=18, default="", unique=True)
     phone = models.CharField(verbose_name="手机号码", max_length=32, default="")
-    team = models.ForeignKey("Team", verbose_name="所属代表队", blank=True, null=True, on_delete=models.SET_NULL)
-    group = models.ManyToManyField("Group",verbose_name="赛事分组", through='RefereeGroup', through_fields=("rid", "gid"))
+    team = models.ForeignKey("Team", verbose_name="所属代表队", blank=True, null=True, on_delete=models.SET_NULL,related_name='referee_team')
+    group = models.ManyToManyField("Group",verbose_name="赛事分组", through='RefereeGroup', through_fields=("rid", "gid"), related_name='referee_group')
 
 
     class Meta:
@@ -115,7 +115,7 @@ class Coach(models.Model):
     name = models.CharField(verbose_name="姓名", max_length=32, db_index=True)
     id_number = models.CharField(verbose_name="身份证号码", max_length=18, default="", unique=True)
     phone = models.CharField(verbose_name="手机号码", max_length=32, default="")
-    team = models.ForeignKey("Team", verbose_name="所属代表队", blank=True, null=True, on_delete=models.SET_NULL)
+    team = models.ForeignKey("Team", verbose_name="所属代表队", blank=True, null=True, on_delete=models.SET_NULL,related_name="coach_team")
 
 
     class Meta:
@@ -135,7 +135,7 @@ class LeaderAndDoctor(models.Model):
     id_number = models.CharField(verbose_name="身份证号码", max_length=18, default="", unique=True)
     phone = models.CharField(verbose_name="手机号码", max_length=32, default="")
     place = models.CharField(verbose_name="职位",max_length=32,choices=PLACE,default="领队")
-    team = models.ForeignKey("Team", verbose_name="所属代表队", blank=True, null=True, on_delete=models.SET_NULL)
+    team = models.ForeignKey("Team", verbose_name="所属代表队", blank=True, null=True, on_delete=models.SET_NULL,related_name='leader_team')
 
     class Meta:
         verbose_name = '领队-队医表'
@@ -164,7 +164,7 @@ class SportManGroup(models.Model):
 
 class Group(models.Model):
     num = models.IntegerField(verbose_name="项目组号",unique=True,default=1)
-    competition = models.ForeignKey("Competition", verbose_name="项目",blank=True,null=True, on_delete=models.SET_NULL)
+    competition = models.ForeignKey("Competition", verbose_name="项目",blank=True,null=True, on_delete=models.SET_NULL, related_name='group_competition')
 
     class Meta:
         verbose_name = '赛事分组表'

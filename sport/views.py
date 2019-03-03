@@ -131,6 +131,34 @@ class TeamView(APIView):
         else:
             raise TeamNotFound
 
+class TeamUpdate(APIView):
+
+    @check_team_token
+    def get(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        queryset = Team.objects.filter(username=username).first()
+        serializer = TeamSerializer(queryset)
+        return Response(serializer.data)
+
+    @check_team_token
+    def post(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        team = Team.objects.filter(username=username).first()
+        if team:
+            password = request.POST.get("password")
+            name = request.POST.get("name")
+            file = request.FILE.get("file")
+            if password and name:
+                team.password = password
+                team.name = name
+                team.file = file
+                team.save()
+                serializer = TeamSerializer(team)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise TeamNotFound
+
+
 
 class CompetitionView(APIView):
 
@@ -183,6 +211,15 @@ class CompetitionView(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         else:
             raise NotFound
+
+
+class GroupView(APIView):
+
+    @check_token
+    def get(self,request):
+        queryset = Group.objects.all().select_related()
+
+
 
 
 
