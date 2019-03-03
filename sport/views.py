@@ -155,6 +155,8 @@ class TeamUpdate(APIView):
                 team.save()
                 serializer = TeamSerializer(team)
                 return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                raise BadRequest
         else:
             raise TeamNotFound
 
