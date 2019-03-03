@@ -41,3 +41,12 @@ class CoachSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaderAndDoctor
         fields = "__all__"
+
+class GroupSerializer(serializers.ModelSerializer):
+    competition_name = serializers.ReadOnlyField(source="competition.name")
+    competition_sex = serializers.ReadOnlyField(source="competition.sex")
+    competition_age_group = serializers.ReadOnlyField(source="competition.age_group")
+
+    class Meta:
+        model = Group
+        fields = "__all__"

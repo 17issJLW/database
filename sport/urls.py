@@ -22,6 +22,9 @@ urlpatterns = [
     path('leader_doctor/<int:people_id>/', LeaderAndDoctorView.as_view(), name="LeaderAndDoctorView"),
     path('coach/', CoachView.as_view(), name="CoachView"),
     path('coach/<int:people_id>/', CoachView.as_view(), name="CoachView"),
-    path('team_update/', TeamUpdate.as_view(), name="TeamUpdate")
+    path('team_update/', TeamUpdate.as_view(), name="TeamUpdate"),
+
+    path('group/', GroupView.as_view(), name="GroupView"),
+    path('group/<int:group_id>/', GroupView.as_view(), name="GroupView"),
 
 ]

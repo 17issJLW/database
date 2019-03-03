@@ -219,7 +219,41 @@ class GroupView(APIView):
 
     @check_token
     def get(self,request):
-        queryset = Group.objects.all().select_related()
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        queryset = Group.objects.select_related("competition").all()
+        page = Pagination()
+        result = page.paginate_queryset(queryset=queryset, request=request, view=self)
+        serializer = GroupSerializer(queryset,many=True)
+        return page.get_paginated_response(serializer.data)
+
+    @check_token
+    def post(self,request):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        serializer = GroupSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            raise BadRequest
+
+    @check_token
+    def delete(self,request,group_id):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        group = Group.objects.filter(pk=group_id).first()
+        if group:
+            serializer = GroupSerializer(group)
+            group.delete()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise NotFound
+
+
 
 
 
