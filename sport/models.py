@@ -163,13 +163,18 @@ class SportManGroup(models.Model):
 
 
 class Group(models.Model):
-    num = models.IntegerField(verbose_name="项目组号", default=1)
+    LEVEL=(
+        ("初赛","初赛"),
+        ("决赛", "决赛"),
+    )
+    num = models.IntegerField(verbose_name="项目组号", default=0)
     competition = models.ForeignKey("Competition", verbose_name="项目",blank=True,null=True, on_delete=models.SET_NULL, related_name='group_competition')
+    level = models.CharField(verbose_name="初赛/决赛",default="初赛",max_length=32,choices=LEVEL)
 
     class Meta:
         verbose_name = '赛事分组表'
         verbose_name_plural = '赛事分组表'
-        unique_together = ["num", "competition"]
+        unique_together = ["num", "competition","level"]
 
     def __str__(self):
         return '%s %s组' % (self.competition.name,self.num)

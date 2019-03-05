@@ -182,7 +182,13 @@ class CompetitionView(APIView):
             raise PermissionDeny
         serializer = CompetitionSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            data = serializer.validated_data
+            competition = Competition.objects.create(
+                name=data.get("name"),
+                age_group=data.get("age_group"),
+                sex=data.get("sex")
+            )
+            group = Group.objects.get_or_create(num=0, competition=competition,level="初赛")
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         else:
             raise BadRequest
@@ -417,13 +423,93 @@ class RefereeView(APIView):
         else:
             raise NotFound
 
-    @check_token
+    @check_team_token
     def delete(self, request, people_id):
         username = request.META.get("REMOTE_USER").get("username")
         referee = Referee.objects.filter(pk=people_id, team__username=username).first()
         if referee:
             serializer = RefereeSerializer(referee)
             referee.delete()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise NotFound
+
+class SportManView(APIView):
+    """
+
+    name = models.CharField(verbose_name="姓名",max_length=32,db_index=True)
+    id_number = models.CharField(verbose_name="身份证号码", max_length=18, default="", unique=True)
+    age = models.IntegerField(verbose_name="年龄", blank=True, null=True)
+    sex = models.CharField(verbose_name="性别", max_length=32, default="男", choices=SEX)
+    age_group = models.CharField(verbose_name="组别",default="7-8岁",choices=AGEGROUP,max_length=32)
+    grade = models.FloatField(verbose_name="文化分数", blank=True, null=True)
+    team = models.ForeignKey("Team", verbose_name="所属代表队",blank=True,null=True,on_delete=models.SET_NULL,related_name='sport_man_team')
+    competition_group = models.ManyToManyField("Group", verbose_name="报名分组", through='SportManGrou
+    """
+
+    @check_team_token
+    def get(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        queryset = SportMan.objects.filter(team__username=username)
+        page = Pagination()
+        result = page.paginate_queryset(queryset=queryset, request=request, view=self)
+        serializer = SportManSerializer(result, many=True)
+        return page.get_paginated_response(serializer.data)
+
+    @check_team_token
+    def post(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        try:
+            team = Team.objects.get(username=username)
+        except:
+            raise NotFound
+        serializer = SportManSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            data = serializer.validated_data
+            sport_man = SportMan.objects.create(
+                name=data.get("name"),
+                id_number=data.get("id_number"),
+                age=data.get("age"),
+                age_group=data.get("age_group"),
+                sex=data.get("sex"),
+                team=team
+            )
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            raise BadRequest
+
+    @check_team_token
+    def put(self,request,people_id):
+        username = request.META.get("REMOTE_USER").get("username")
+        try:
+            team = Team.objects.get(username=username)
+        except:
+            raise NotFound
+
+        sport_man = SportMan.objects.filter(pk=people_id, team__username=username).first()
+        if sport_man:
+            serializer = SportManSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            data = serializer.validated_data
+            sport_man = SportMan.objects.create(
+                name=data.get("name"),
+                id_number=data.get("id_number"),
+                age=data.get("age"),
+                sex=data.get("sex"),
+                age_group=data.get("age_group")
+            )
+            serializer = SportManSerializer(sport_man)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise NotFound
+
+    @check_team_token
+    def delete(self, request, people_id):
+        username = request.META.get("REMOTE_USER").get("username")
+        sport_man = SportMan.objects.filter(pk=people_id, team__username=username).first()
+        if sport_man:
+            serializer = SportManSerializer(sport_man)
+            sport_man.delete()
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             raise NotFound

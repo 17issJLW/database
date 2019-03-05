@@ -30,4 +30,9 @@ urlpatterns = [
     path('referee/', RefereeView.as_view(), name="RefereeView"),
     path('referee/<int:people_id>/', RefereeView.as_view(), name="RefereeView"),
 
+    path('sport_man/', SportManView.as_view(), name="SportManView"),
+    path('sport_man/<int:people_id>/', SportManView.as_view(), name="SportManView"),
+
+
+
 ]

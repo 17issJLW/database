@@ -48,6 +48,27 @@ class GroupSerializer(serializers.ModelSerializer):
     competition_sex = serializers.ReadOnlyField(source="competition.sex")
     competition_age_group = serializers.ReadOnlyField(source="competition.age_group")
 
+
     class Meta:
         model = Group
         fields = "__all__"
+
+class SportManSerializer(serializers.ModelSerializer):
+
+    team_name = serializers.ReadOnlyField(source="team.name")
+    competition_group = serializers.ReadOnlyField(source="competition_group.competition.name")
+
+    class Meta:
+        model = SportMan
+        fields = "__all__"
+
+    def validate(self, attrs):
+        if 7<= attrs['age'] <=8:
+            attrs["age_group"] = "7-8"
+        elif 9<= attrs['age'] <=10:
+            attrs["age_group"] = "9-10"
+        elif 11<= attrs['age'] <=12:
+            attrs["age_group"] = "11-12"
+        else:
+            raise serializers.ValidationError("没有适合该年龄的比赛")
+        return attrs
