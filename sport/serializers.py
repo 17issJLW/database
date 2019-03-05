@@ -48,15 +48,21 @@ class GroupSerializer(serializers.ModelSerializer):
     competition_sex = serializers.ReadOnlyField(source="competition.sex")
     competition_age_group = serializers.ReadOnlyField(source="competition.age_group")
 
+    people = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Group
         fields = "__all__"
 
+    def get_people(self,obj):
+        people = obj.sport_man.all().values()
+        return list(people)
+
 class SportManSerializer(serializers.ModelSerializer):
 
     team_name = serializers.ReadOnlyField(source="team.name")
-    competition_group = serializers.ReadOnlyField(source="competition_group.competition.name")
+    competition_group_list = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = SportMan
@@ -72,3 +78,19 @@ class SportManSerializer(serializers.ModelSerializer):
         else:
             raise serializers.ValidationError("没有适合该年龄的比赛")
         return attrs
+
+    def get_competition_group_list(self,obj):
+        competition_group_list = obj.competition_group.all().values()
+        return list(competition_group_list)
+
+
+class SportManGroupSerializer(serializers.ModelSerializer):
+    sport_man_name = serializers.ReadOnlyField(source="sid.name")
+    sport_man_id = serializers.ReadOnlyField(source="sid.id_number")
+    competition_name = serializers.ReadOnlyField(source="gid.competition.name")
+    competition_sex = serializers.ReadOnlyField(source="gid.competition.sex")
+    competition_age_group = serializers.ReadOnlyField(source="gid.competition.age_group")
+
+    class Meta:
+        model = SportManGroup
+        fields = "__all__"

@@ -147,11 +147,17 @@ class TeamUpdate(APIView):
         if team:
             password = request.POST.get("password")
             name = request.POST.get("name")
-            file = request.FILE.get("file")
-            if password and name:
+            file = request.FILES.get("file")
+            if password and name and file:
                 team.password = password
                 team.name = name
                 team.file = file
+                team.save()
+                serializer = TeamSerializer(team)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            elif password and name:
+                team.password = password
+                team.name = name
                 team.save()
                 serializer = TeamSerializer(team)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -223,11 +229,11 @@ class CompetitionView(APIView):
 
 class GroupView(APIView):
 
-    @check_token
+    # @check_token
     def get(self,request):
-        type = request.META.get("REMOTE_USER").get("type")
-        if type != "admin":
-            raise PermissionDeny
+        # type = request.META.get("REMOTE_USER").get("type")
+        # if type != "admin":
+        #     raise PermissionDeny
         queryset = Group.objects.select_related("competition").all()
         page = Pagination()
         result = page.paginate_queryset(queryset=queryset, request=request, view=self)
@@ -474,7 +480,7 @@ class SportManView(APIView):
                 sex=data.get("sex"),
                 team=team
             )
-            return Response(serializer.data,status=status.HTTP_200_OK)
+            return Response(data,status=status.HTTP_200_OK)
         else:
             raise BadRequest
 
@@ -511,5 +517,50 @@ class SportManView(APIView):
             serializer = SportManSerializer(sport_man)
             sport_man.delete()
             return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise NotFound
+
+
+class SignUpView(APIView):
+
+    @check_team_token
+    def get(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        queryset = SportManGroup.objects.filter(sid__team__username=username)
+        page = Pagination()
+        result = page.paginate_queryset(queryset=queryset, request=request, view=self)
+        serializer = SportManGroupSerializer(result, many=True)
+        return page.get_paginated_response(serializer.data)
+
+
+    @check_team_token
+    def put(self,request,people_id):
+        username = request.META.get("REMOTE_USER").get("username")
+        request_data = request.data
+        sport_man = SportMan.objects.filter(pk=people_id,team__username=username).first()
+        if not sport_man:
+            raise NotFound
+        group_id = request_data.get("group")
+        group = Group.objects.filter(pk=group_id,
+                                     competition__age_group=sport_man.age_group,
+                                     competition__sex=sport_man.sex).first()
+        if not group:
+            raise NotMatch
+
+        sport_man_group = SportManGroup.objects.create(sid=sport_man, gid=group)
+        serializer = SportManGroupSerializer(sport_man_group)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+    @check_team_token
+    def delete(self,request,people_id,group_id):
+        username = request.META.get("REMOTE_USER").get("username")
+        sport_man = SportMan.objects.filter(pk=people_id, team__username=username).first()
+        if not sport_man:
+            raise NotFound
+        group = Group.objects.filter(pk=group_id).first()
+        sport_man_group = SportManGroup.objects.filter(sid=sport_man, gid=group).first()
+        if sport_man_group:
+            sport_man_group.delete()
         else:
             raise NotFound

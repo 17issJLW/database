@@ -33,6 +33,10 @@ urlpatterns = [
     path('sport_man/', SportManView.as_view(), name="SportManView"),
     path('sport_man/<int:people_id>/', SportManView.as_view(), name="SportManView"),
 
+    path('sign_up/', SignUpView.as_view(), name="SignUpView"),
+    path('sign_up/<int:people_id>/', SignUpView.as_view(), name="SignUpView"),
+    path('sign_up/<int:people_id>/<int:group_id>/', SignUpView.as_view(), name="SignUpView"),
+
 
 
 ]

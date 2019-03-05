@@ -41,3 +41,7 @@ class EducationCrash(APIException):
 class TooManyCourse(APIException):
     status_code = 403
     default_detail = "Too many courses"
+
+class NotMatch(APIException):
+    status_code = 422
+    default_detail = "类别与运动员不匹配"
