@@ -144,10 +144,11 @@ class TeamUpdate(APIView):
     def post(self,request):
         username = request.META.get("REMOTE_USER").get("username")
         team = Team.objects.filter(username=username).first()
+        request_data = request.data
         if team:
-            password = request.POST.get("password")
-            name = request.POST.get("name")
-            file = request.FILES.get("file")
+            password = request_data.get("password")
+            name = request_data.get("name")
+            file = request_data.get("file")
             print(password,name,file)
             if password and name and file:
                 team.password = password
