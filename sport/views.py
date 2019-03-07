@@ -148,6 +148,7 @@ class TeamUpdate(APIView):
             password = request.POST.get("password")
             name = request.POST.get("name")
             file = request.FILES.get("file")
+            print(password,name,file)
             if password and name and file:
                 team.password = password
                 team.name = name
