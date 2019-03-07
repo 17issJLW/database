@@ -516,7 +516,7 @@ class SportManView(APIView):
         if sport_man:
             serializer = SportManSerializer(sport_man)
             sport_man.delete()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({"OK"}, status=status.HTTP_200_OK)
         else:
             raise NotFound
 
