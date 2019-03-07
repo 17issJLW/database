@@ -220,9 +220,8 @@ class CompetitionView(APIView):
             raise PermissionDeny
         competition = Competition.objects.filter(pk=competition_id).first()
         if competition:
-            serializer = CompetitionSerializer(competition)
             competition.delete()
-            return Response(serializer.data,status=status.HTTP_200_OK)
+            return Response({"ok"},status=status.HTTP_200_OK)
         else:
             raise NotFound
 
