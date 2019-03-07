@@ -153,14 +153,14 @@ class TeamUpdate(APIView):
                 team.name = name
                 team.file = file
                 team.save()
-                serializer = TeamSerializer(team)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                # serializer = TeamSerializer(team)
+                return Response({"ok"}, status=status.HTTP_200_OK)
             elif password and name:
                 team.password = password
                 team.name = name
                 team.save()
-                serializer = TeamSerializer(team)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                # serializer = TeamSerializer(team)
+                return Response({"ok"}, status=status.HTTP_200_OK)
             else:
                 raise BadRequest
         else:
