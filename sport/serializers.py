@@ -3,9 +3,11 @@ from .models import *
 
 class TeamSerializer(serializers.ModelSerializer):
 
+
     class Meta:
         model = Team
         fields = "__all__"
+
 
 class RefereeSerializer(serializers.ModelSerializer):
     team_name = serializers.ReadOnlyField(source="team.name")
@@ -15,6 +17,8 @@ class RefereeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class CompetitionSerializer(serializers.ModelSerializer):
+
+    group =serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Competition
@@ -27,6 +31,10 @@ class CompetitionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("比赛项目和性别不符")
 
         return attrs
+
+    def get_group(self,obj):
+        group = obj.group_competition.all().values()
+        return list(group)
 
 class LeaderAndDoctorSerializer(serializers.ModelSerializer):
     # team = serializers.ReadOnlyField()
