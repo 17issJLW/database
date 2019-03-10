@@ -12,9 +12,11 @@ class TeamSerializer(serializers.ModelSerializer):
 class RefereeSerializer(serializers.ModelSerializer):
     team_name = serializers.ReadOnlyField(source="team.name")
 
+
     class Meta:
         model = Referee
         fields = "__all__"
+
 
 class CompetitionSerializer(serializers.ModelSerializer):
 
@@ -95,10 +97,17 @@ class SportManSerializer(serializers.ModelSerializer):
 class SportManGroupSerializer(serializers.ModelSerializer):
     sport_man_name = serializers.ReadOnlyField(source="sid.name")
     sport_man_id = serializers.ReadOnlyField(source="sid.id_number")
+    group_id = serializers.ReadOnlyField(source="gid.id")
     competition_name = serializers.ReadOnlyField(source="gid.competition.name")
     competition_sex = serializers.ReadOnlyField(source="gid.competition.sex")
     competition_age_group = serializers.ReadOnlyField(source="gid.competition.age_group")
 
     class Meta:
         model = SportManGroup
+        fields = "__all__"
+
+class RefereeGroupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RefereeGroup
         fields = "__all__"
