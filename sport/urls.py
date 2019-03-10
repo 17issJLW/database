@@ -23,6 +23,7 @@ urlpatterns = [
     path('coach/', CoachView.as_view(), name="CoachView"),
     path('coach/<int:people_id>/', CoachView.as_view(), name="CoachView"),
     path('team_update/', TeamUpdate.as_view(), name="TeamUpdate"),
+    path('referee_update/', RefereeUpdate.as_view(), name="RefereeUpdate"),
 
     path('group/', GroupView.as_view(), name="GroupView"),
     path('group/<int:group_id>/', GroupView.as_view(), name="GroupView"),
@@ -35,7 +36,7 @@ urlpatterns = [
 
     path('sign_up/', SignUpView.as_view(), name="SignUpView"),
     path('sign_up/<int:people_id>/', SignUpView.as_view(), name="SignUpView"),
-    path('sign_up/<int:people_id>/<int:group_id>/', SignUpView.as_view(), name="SignUpView"),
+    path('sign_up/<int:people_id>/<int:competition_id>/', SignUpView.as_view(), name="SignUpView"),
 
 
 

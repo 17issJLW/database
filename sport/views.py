@@ -1,7 +1,7 @@
 from lib.rest_framework.exceptions import *
 from rest_framework.views import APIView, status,Response
 from lib.rest_framework.util import *
-from lib.rest_framework.permissions import check_token,check_team_token
+from lib.rest_framework.permissions import check_token,check_team_token,check_referee_token
 from rest_framework.pagination import PageNumberPagination
 
 from .models import *
@@ -174,9 +174,6 @@ class CompetitionView(APIView):
 
     @check_token
     def get(self,request):
-        type = request.META.get("REMOTE_USER").get("type")
-        if type != "admin":
-            raise PermissionDeny
         queryset = Competition.objects.all()
         page = Pagination()
         result = page.paginate_queryset(queryset=queryset,request=request,view=self)
@@ -539,29 +536,48 @@ class SignUpView(APIView):
         username = request.META.get("REMOTE_USER").get("username")
         request_data = request.data
         sport_man = SportMan.objects.filter(pk=people_id,team__username=username).first()
-        if not sport_man:
+        competition = Competition.objects.filter(pk=request_data.get("competition")).first()
+        if not sport_man or not competition:
             raise NotFound
-        group_id = request_data.get("group")
-        group = Group.objects.filter(pk=group_id,
-                                     competition__age_group=sport_man.age_group,
-                                     competition__sex=sport_man.sex).first()
-        if not group:
+        if sport_man.sex == competition.sex and sport_man.age_group == competition.age_group:
+            group = Group.objects.get_or_create(num=0, competition=competition, level="初赛")
+            sport_man_group = SportManGroup.objects.create(sid=sport_man, gid=group)
+            serializer = SportManGroupSerializer(sport_man_group)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
             raise NotMatch
-
-        sport_man_group = SportManGroup.objects.create(sid=sport_man, gid=group)
-        serializer = SportManGroupSerializer(sport_man_group)
-        return Response(serializer.data,status=status.HTTP_200_OK)
 
 
     @check_team_token
-    def delete(self,request,people_id,group_id):
+    def delete(self,request,people_id,competition_id):
         username = request.META.get("REMOTE_USER").get("username")
         sport_man = SportMan.objects.filter(pk=people_id, team__username=username).first()
         if not sport_man:
             raise NotFound
-        group = Group.objects.filter(pk=group_id).first()
-        sport_man_group = SportManGroup.objects.filter(sid=sport_man, gid=group).first()
+        sport_man_group = SportManGroup.objects.filter(sid__id=people_id, gid__competition__id=competition_id).first()
         if sport_man_group:
             sport_man_group.delete()
+        else:
+            raise NotFound
+
+
+class RefereeUpdate(APIView):
+
+    @check_referee_token
+    def get(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        queryset = Referee.objects.filter(username=username).first()
+        serializer = RefereeSerializer(queryset)
+        return Response(serializer.data)
+
+    @check_referee_token
+    def post(self, request):
+        username = request.META.get("REMOTE_USER").get("username")
+        referee = Referee.objects.filter(username=username).first()
+        if referee:
+            serializer = RefereeSerializer(referee, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(request.data,status=status.HTTP_200_OK)
         else:
             raise NotFound
