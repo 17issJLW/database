@@ -58,7 +58,7 @@ class GroupSerializer(serializers.ModelSerializer):
     competition_sex = serializers.ReadOnlyField(source="competition.sex")
     competition_age_group = serializers.ReadOnlyField(source="competition.age_group")
 
-    people = serializers.SerializerMethodField()
+    people = serializers.SerializerMethodField(read_only=True)
 
 
     class Meta:
