@@ -542,9 +542,8 @@ class SignUpView(APIView):
         if sport_man.sex == competition.sex and sport_man.age_group == competition.age_group:
             if SportManGroup.objects.filter(sid__team__username=username,gid__competition__id=request_data.get("competition")).count() >= 6:
                 raise TooManyPeople
-            tuple,group = Group.objects.get_or_create(num=0, competition=competition, level="初赛")
-            print(tuple,group)
-            sport_man_group = SportManGroup.objects.create(sid=sport_man, gid=tuple[1])
+            group,success = Group.objects.get_or_create(num=0, competition=competition, level="初赛")
+            sport_man_group = SportManGroup.objects.create(sid=sport_man, gid=group)
             serializer = SportManGroupSerializer(sport_man_group)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
