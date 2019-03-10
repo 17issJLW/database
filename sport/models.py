@@ -96,7 +96,7 @@ class Referee(models.Model):
     id_number = models.CharField(verbose_name="身份证号码", max_length=18, default="", unique=True)
     phone = models.CharField(verbose_name="手机号码", max_length=32, default="")
     team = models.ForeignKey("Team", verbose_name="所属代表队", blank=True, null=True, on_delete=models.SET_NULL,related_name='referee_team')
-    group = models.ManyToManyField("Group",verbose_name="赛事分组", through='RefereeGroup', through_fields=("rid", "gid"), related_name='referee_group')
+    group = models.ManyToManyField("Group",verbose_name="赛事分组", through='RefereeGroup', through_fields=("referee", "group"), related_name='referee_group')
 
 
     class Meta:
@@ -180,10 +180,12 @@ class Group(models.Model):
         return '%s %s组' % (self.competition.name,self.num)
 
 class RefereeGroup(models.Model):
-    rid = models.ForeignKey(Referee,verbose_name="裁判",blank=True,null=True, on_delete=models.SET_NULL)
-    gid = models.ForeignKey("Group",verbose_name="赛事分组",blank=True, null=True, on_delete=models.SET_NULL)
+    referee = models.ForeignKey(Referee,verbose_name="裁判",blank=True,null=True, on_delete=models.SET_NULL)
+    group = models.ForeignKey("Group",verbose_name="赛事分组",blank=True, null=True, on_delete=models.SET_NULL)
     is_leader = models.BooleanField(verbose_name="小组总裁判",default=False)
 
-
+    class Meta:
+        verbose_name = '裁判分组表'
+        verbose_name_plural = '裁判分组表'
 
 
