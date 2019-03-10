@@ -523,7 +523,7 @@ class SignUpView(APIView):
     @check_team_token
     def get(self,request):
         username = request.META.get("REMOTE_USER").get("username")
-        queryset = SportManGroup.objects.filter(sid__team__username=username).query.group_by("sid.name")
+        queryset = SportManGroup.objects.filter(sid__team__username=username).order_by("sid__id")
         page = Pagination()
         result = page.paginate_queryset(queryset=queryset, request=request, view=self)
         serializer = SportManGroupSerializer(result, many=True)
