@@ -38,6 +38,7 @@ urlpatterns = [
     path('sign_up/<int:people_id>/', SignUpView.as_view(), name="SignUpView"),
     path('sign_up/<int:people_id>/<int:competition_id>/', SignUpView.as_view(), name="SignUpView"),
 
+    path('change_group/', ChangeGroupView.as_view(), name="ChangeGroupView"),
 
 
 ]

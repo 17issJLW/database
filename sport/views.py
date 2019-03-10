@@ -602,15 +602,22 @@ class ChangeGroupView(APIView):
         people = request_data.get("people_list")
         group_id = request_data.get("group")
         competiton_id = request_data.get("competiton")
-        group = Group.objects.filter(pk=group_id, competition__id=competiton_id).first()
+        group = Group.objects.filter(pk=group_id).first()
         if not people or not group:
             raise NotFound
-        for i in people:
-            sport_man = SportMan.objects.filter(pk=i).first()
-            if sport_man:
-                SportManGroup.objects.create(sid=sport_man,gid=group)
+        try:
+            for i in people:
+                sport_man_group = SportManGroup.objects.filter(sid=i, gid__competition__id=competiton_id).first()
+                if sport_man_group:
+                    sport_man_group.gid = group
+                    sport_man_group.save()
+                else:
+                    return Response({"Not Found"}, status=status.HTTP_404_NOT_FOUND)
+        except:
+            raise UnknowError
 
         return Response({"ok"}, status=status.HTTP_200_OK)
+
 
 
 

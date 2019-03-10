@@ -45,3 +45,7 @@ class TooManyPeople(APIException):
 class NotMatch(APIException):
     status_code = 422
     default_detail = "类别与运动员不匹配"
+
+class UnknowError(APIException):
+    status_code = 502
+    default_detail = "服务器未知错误"
