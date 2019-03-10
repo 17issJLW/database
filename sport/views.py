@@ -194,7 +194,7 @@ class CompetitionView(APIView):
                 sex=data.get("sex")
             )
             group = Group.objects.get_or_create(num=0, competition=competition,level="初赛")
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
+            return Response(data,status=status.HTTP_201_CREATED)
         else:
             raise BadRequest
 
@@ -540,6 +540,8 @@ class SignUpView(APIView):
         if not sport_man or not competition:
             raise NotFound
         if sport_man.sex == competition.sex and sport_man.age_group == competition.age_group:
+            if SportManGroup.objects.filter(sid__team__username=username,gid__competition__id=request_data.get("competition")).count() >= 6:
+                raise TooManyPeople
             group = Group.objects.get_or_create(num=0, competition=competition, level="初赛")
             sport_man_group = SportManGroup.objects.create(sid=sport_man, gid=group)
             serializer = SportManGroupSerializer(sport_man_group)
@@ -581,3 +583,39 @@ class RefereeUpdate(APIView):
                 return Response(request.data,status=status.HTTP_200_OK)
         else:
             raise NotFound
+
+class ChangeGroupView(APIView):
+
+    @check_token
+    def get(self,request,group_id):
+        group = Group.objects.filter(pk=group_id).first()
+        serializer = GroupSerializer(group)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+    @check_token
+    def post(self, request):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        request_data = request.data
+        people = request_data.get("people_list")
+        group_id = request_data.get("group")
+        competiton_id = request_data.get("competiton")
+        group = Group.objects.filter(pk=group_id, competition__id=competiton_id).first()
+        if not people or not group:
+            raise NotFound
+        for i in people:
+            sport_man = SportMan.objects.filter(pk=i).first()
+            if sport_man:
+                SportManGroup.objects.create(sid=sport_man,gid=group)
+
+        return Response({"ok"}, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+

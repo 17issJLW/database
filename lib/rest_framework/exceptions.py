@@ -38,9 +38,9 @@ class EducationCrash(APIException):
     status_code = 400
     default_detail = "educational system is not available now"
 
-class TooManyCourse(APIException):
-    status_code = 403
-    default_detail = "Too many courses"
+class TooManyPeople(APIException):
+    status_code = 422
+    default_detail = "当前代表队报名人数过多"
 
 class NotMatch(APIException):
     status_code = 422
