@@ -97,7 +97,7 @@ class SportManSerializer(serializers.ModelSerializer):
 class SportManGroupSerializer(serializers.ModelSerializer):
     sport_man_name = serializers.ReadOnlyField(source="sid.name")
     sport_man_id = serializers.ReadOnlyField(source="sid.id_number")
-    group_id = serializers.ReadOnlyField(source="gid.id")
+    group_num = serializers.ReadOnlyField(source="gid.num")
     competition_name = serializers.ReadOnlyField(source="gid.competition.name")
     competition_sex = serializers.ReadOnlyField(source="gid.competition.sex")
     competition_age_group = serializers.ReadOnlyField(source="gid.competition.age_group")
