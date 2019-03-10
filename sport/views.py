@@ -620,10 +620,43 @@ class ChangeGroupView(APIView):
 class ChangeRefereeGroupView(APIView):
 
     @check_token
-    def get(self, request, group_id):
-        group = Referee.objects.filter(pk=group_id).first()
-        serializer = RefereeSerializer(group)
+    def get(self, request):
+        group = RefereeGroup.objects.all()
+        serializer = RefereeGroupSerializer(group)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @check_token
+    def post(self,request):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        request_data = request.data
+        people = request_data.get("people_list")
+        group_id = request_data.get("group")
+        group = Group.objects.filter(pk=group_id).first()
+        if not people or not group:
+            raise NotFound
+        try:
+            for i in people:
+                referee_group,create = RefereeGroup.objects.filter(group__id=group_id, referee__id=i).first()
+                if referee_group:
+                    pass
+                else:
+                    referee = Referee.objects.filter(pk=i).first()
+                    referee_group = RefereeGroup.objects.create(group=group,referee=referee)
+                    serializer = RefereeGroupSerializer(referee_group)
+                    return Response(serializer.data,status=status.HTTP_200_OK)
+        except:
+            raise UnknowError
+
+    @check_token
+    def delete(self,request,people_id,group_id):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        referee_group = RefereeGroup.objects.filter(group__id=group_id, referee__people=people_id)
+        referee_group.delete()
+        return Response({"ok"},status=status.HTTP_200_OK)
 
 
 

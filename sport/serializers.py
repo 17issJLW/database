@@ -107,6 +107,8 @@ class SportManGroupSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class RefereeGroupSerializer(serializers.ModelSerializer):
+    referee = serializers.ReadOnlyField(source="rid")
+    group = serializers.ReadOnlyField(source="gid")
 
     class Meta:
         model = RefereeGroup
