@@ -41,6 +41,10 @@ urlpatterns = [
     path('change_group/', ChangeGroupView.as_view(), name="ChangeGroupView"),
     path('change_referee_group/', ChangeRefereeGroupView.as_view(), name="ChangeRefereeGroupView"),
     path('change_referee_group/<int:people_id>/<int:group_id>/', ChangeRefereeGroupView.as_view(), name="ChangeRefereeGroupView"),
+    path('start/', StartGame.as_view(), name="StartGame"),
+
+    path('referee_grade/', GradeTheSport.as_view(), name="GradeTheSport"),
+    path('get_sport_man/', GetSportMan.as_view(), name="GetSportMan"),
 
 
 ]

@@ -4,6 +4,7 @@ from lib.rest_framework.util import *
 from lib.rest_framework.permissions import check_token,check_team_token,check_referee_token
 from rest_framework.pagination import PageNumberPagination
 
+
 from .models import *
 from .serializers import *
 # Create your views here.
@@ -561,6 +562,14 @@ class SignUpView(APIView):
         else:
             raise NotFound
 
+class GetSportMan(APIView):
+
+    @check_token
+    def get(self,request):
+        queryset = SportManGroup.objects.all()
+        serializer = SportManGroupSerializer(queryset,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
 
 class RefereeUpdate(APIView):
 
@@ -657,6 +666,48 @@ class ChangeRefereeGroupView(APIView):
         referee_group = RefereeGroup.objects.filter(group__id=group_id, referee__people=people_id)
         referee_group.delete()
         return Response({"ok"},status=status.HTTP_200_OK)
+
+class StartGame(APIView):
+
+    @check_token
+    def get(self,request):
+        queryset = Group.objects.all()
+        serializer = GroupSerializer(queryset)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+    @check_token
+    def post(self,request):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        group_id = request.data.get("group")
+        group = Group.objects.filter(pk=group_id).first()
+        if group:
+            group.status = "待评价"
+            group.save()
+            return Response({"message":group_id}, status=status.HTTP_200_OK)
+        else:
+            raise NotFound
+
+
+class GradeTheSport(APIView):
+
+    @check_referee_token
+    def get(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        referee = Referee.objects.filter(username=username).first()
+        group_list = list(referee.group.filter(status="待打分").values("id"))
+        group_id = []
+        for group in group_list:
+            group_id.append(group.get("id"))
+        people = SportMan.objects.filter(competition_group__id__in=group_id)
+        serializer = SportManSerializer(people, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+    @check_referee_token
+    def post(self, request):
+        username = request.META.get("REMOTE_USER").get("username")
+        referee = Referee.objects.filter(username=username).first()
 
 
 
