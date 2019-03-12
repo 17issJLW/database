@@ -609,7 +609,7 @@ class ChangeGroupView(APIView):
         request_data = request.data
         people = request_data.get("people_list")
         group_id = request_data.get("group")
-        competiton_id = request_data.get("competiton")
+        competiton_id = request_data.get("competition")
         group = Group.objects.filter(pk=group_id).first()
         print("1")
         print(people, group_id, competiton_id)
