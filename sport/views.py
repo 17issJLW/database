@@ -100,7 +100,7 @@ class TeamView(APIView):
                 password=data.get("password"),
                 name = data.get("name"),
             )
-            return Response({"username":team.username,"password":team.password,"name":team.username},status=status.HTTP_201_CREATED)
+            return Response({"username":team.username,"password":team.password,"name":team.name},status=status.HTTP_201_CREATED)
         else:
             raise BadRequest
 

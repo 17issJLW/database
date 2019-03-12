@@ -26,6 +26,8 @@ class Competition(models.Model):
         ("鞍马", "鞍马"),
         ("蹦床", "蹦床"),
 
+
+        ("跳马","跳马"),
         ("高低杠", "高低杠"),
         ("平衡木", "平衡木"),
 
@@ -167,9 +169,16 @@ class Group(models.Model):
         ("初赛","初赛"),
         ("决赛", "决赛"),
     )
+    STATUS = (
+        ("未开始","未开始"),
+        ("待打分","待打分"),
+        ("待审核", "待审核"),
+        ("已确认", "已确认"),
+    )
     num = models.IntegerField(verbose_name="项目组号", default=0)
     competition = models.ForeignKey("Competition", verbose_name="项目",blank=True,null=True, on_delete=models.SET_NULL, related_name='group_competition')
     level = models.CharField(verbose_name="初赛/决赛",default="初赛",max_length=32,choices=LEVEL)
+    status = models.CharField(verbose_name="状态",max_length=32,default="未开始",choices=STATUS)
 
     class Meta:
         verbose_name = '赛事分组表'
@@ -187,5 +196,18 @@ class RefereeGroup(models.Model):
     class Meta:
         verbose_name = '裁判分组表'
         verbose_name_plural = '裁判分组表'
+
+
+class Score(models.Model):
+    referee = models.ForeignKey(Referee, verbose_name="裁判", blank=True, null=True, on_delete=models.SET_NULL)
+    group = models.ForeignKey(Group, verbose_name="赛事分组", blank=True, null=True, on_delete=models.SET_NULL)
+    sport_man = models.ForeignKey(SportMan, verbose_name="运动员",blank=True, null=True, on_delete=models.SET_NULL)
+    grade = models.FloatField()
+    is_pass = models.BooleanField(default=True, verbose_name="是否通过")
+
+    class Meta:
+        verbose_name = '打分表'
+        verbose_name_plural = '打分表'
+
 
 
