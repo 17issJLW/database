@@ -611,8 +611,12 @@ class ChangeGroupView(APIView):
         group_id = request_data.get("group")
         competiton_id = request_data.get("competiton")
         group = Group.objects.filter(pk=group_id).first()
+        print("1")
+        print(people, group_id, competiton_id)
         if not people or not group:
             raise NotFound
+        print("hhh")
+        print(people,group_id,competiton_id)
         try:
             for i in people:
                 sport_man_group = SportManGroup.objects.filter(sid__id=i, gid__competition__id=competiton_id).first()
