@@ -615,7 +615,7 @@ class ChangeGroupView(APIView):
             raise NotFound
         try:
             for i in people:
-                sport_man_group = SportManGroup.objects.filter(sid=i, gid__competition__id=competiton_id).first()
+                sport_man_group = SportManGroup.objects.filter(sid__id=i, gid__competition__id=competiton_id).first()
                 if sport_man_group:
                     sport_man_group.gid = group
                     sport_man_group.save()
