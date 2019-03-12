@@ -566,7 +566,7 @@ class GetSportMan(APIView):
 
     @check_token
     def get(self,request):
-        queryset = SportManGroup.objects.all()
+        queryset = SportManGroup.objects.filter(sid__isnull=False)
         serializer = SportManGroupSerializer(queryset,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
