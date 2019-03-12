@@ -40,6 +40,7 @@ urlpatterns = [
 
     path('change_group/', ChangeGroupView.as_view(), name="ChangeGroupView"),
     path('change_referee_group/', ChangeRefereeGroupView.as_view(), name="ChangeRefereeGroupView"),
+    path('change_referee_group/<int:people_id>/<int:group_id>/', ChangeRefereeGroupView.as_view(), name="ChangeRefereeGroupView"),
 
 
 ]
