@@ -652,7 +652,7 @@ class ChangeRefereeGroupView(APIView):
             raise NotFound
         # try:
         for i in people:
-            referee_group,create = RefereeGroup.objects.filter(group__id=group_id, referee__id=i).first()
+            referee_group = RefereeGroup.objects.filter(group__id=group_id, referee__id=i).first()
             if referee_group:
                 pass
             else:
