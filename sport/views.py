@@ -671,6 +671,15 @@ class ChangeRefereeGroupView(APIView):
         referee_group.delete()
         return Response({"ok"},status=status.HTTP_200_OK)
 
+
+class GetAllReferee(APIView):
+
+    @check_token
+    def get(self, request):
+        referee = Referee.objects.all()
+        serializer = RefereeSerializer(referee)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 class StartGame(APIView):
 
     @check_token
