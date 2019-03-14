@@ -668,7 +668,7 @@ class ChangeRefereeGroupView(APIView):
         type = request.META.get("REMOTE_USER").get("type")
         if type != "admin":
             raise PermissionDeny
-        referee_group = RefereeGroup.objects.filter(group__id=group_id, referee__people=people_id)
+        referee_group = RefereeGroup.objects.filter(group__id=group_id, referee__id=people_id)
         referee_group.delete()
         return Response({"ok"},status=status.HTTP_200_OK)
 
