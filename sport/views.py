@@ -650,18 +650,18 @@ class ChangeRefereeGroupView(APIView):
         print(people, group_id)
         if not people or not group:
             raise NotFound
-        try:
-            for i in people:
-                referee_group,create = RefereeGroup.objects.filter(group__id=group_id, referee__id=i).first()
-                if referee_group:
-                    pass
-                else:
-                    referee = Referee.objects.filter(pk=i).first()
-                    referee_group = RefereeGroup.objects.create(group=group,referee=referee)
-                    serializer = RefereeGroupSerializer(referee_group)
-                    return Response(serializer.data,status=status.HTTP_200_OK)
-        except:
-            raise UnknowError
+        # try:
+        for i in people:
+            referee_group,create = RefereeGroup.objects.filter(group__id=group_id, referee__id=i).first()
+            if referee_group:
+                pass
+            else:
+                referee = Referee.objects.filter(pk=i).first()
+                referee_group = RefereeGroup.objects.create(group=group,referee=referee)
+                serializer = RefereeGroupSerializer(referee_group)
+                return Response(serializer.data,status=status.HTTP_200_OK)
+        # except:
+        #     raise UnknowError
 
     @check_token
     def delete(self,request,people_id,group_id):
