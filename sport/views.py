@@ -658,8 +658,8 @@ class ChangeRefereeGroupView(APIView):
             else:
                 referee = Referee.objects.filter(pk=i).first()
                 referee_group = RefereeGroup.objects.create(group=group,referee=referee)
-                serializer = RefereeGroupSerializer(referee_group)
-                return Response(serializer.data,status=status.HTTP_200_OK)
+
+        return Response({"ok"},status=status.HTTP_200_OK)
         # except:
         #     raise UnknowError
 
