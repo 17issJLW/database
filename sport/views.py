@@ -647,6 +647,7 @@ class ChangeRefereeGroupView(APIView):
         people = request_data.get("people_list")
         group_id = request_data.get("group")
         group = Group.objects.filter(pk=group_id).first()
+        print(people, group_id)
         if not people or not group:
             raise NotFound
         try:
