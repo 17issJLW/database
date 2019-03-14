@@ -91,7 +91,7 @@ class SportManSerializer(serializers.ModelSerializer):
         return attrs
 
     def get_competition_group_list(self,obj):
-        competition_group_list = obj.competition_group.all().values()
+        competition_group_list = obj.competition_group.all().values("num","competition","level","status","competition__name","competition__sex","competition__age_group")
         return list(competition_group_list)
 
 
