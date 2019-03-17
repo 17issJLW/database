@@ -697,7 +697,9 @@ class StartGame(APIView):
         group_id = request.data.get("group")
         group = Group.objects.filter(pk=group_id).first()
         if group:
-            group.status = "待评价"
+            if group.status != "未开始":
+                raise StatusError
+            group.status = "待打分"
             group.save()
             return Response({"message":group_id}, status=status.HTTP_200_OK)
         else:
@@ -753,7 +755,20 @@ class GradeTheSport(APIView):
         else:
             raise BadRequest
 
+class ConfirmGrade(APIView):
 
+    @check_referee_token
+    def get(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        group_list = RefereeGroup.objects.filter(referee__username=username,is_leader=True)
+        if group_list:
+            group_id = []
+            for i in group_list:
+                group_id.append(i.group)
+
+            pass
+        else:
+            return Response({"message":"您不是小组总裁判"})
 
 
 
