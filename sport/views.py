@@ -773,7 +773,7 @@ class ConfirmGrade(APIView):
             group_id = []
             for i in group_list:
                 group_id.append(i.group)
-            g
+            pass
         else:
             return Response({"message":"您不是小组总裁判"})
 
