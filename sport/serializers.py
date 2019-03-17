@@ -57,7 +57,6 @@ class GroupSerializer(serializers.ModelSerializer):
     competition_name = serializers.ReadOnlyField(source="competition.name")
     competition_sex = serializers.ReadOnlyField(source="competition.sex")
     competition_age_group = serializers.ReadOnlyField(source="competition.age_group")
-    status = serializers.ReadOnlyField(source="status")
 
     people = serializers.SerializerMethodField(read_only=True)
 
@@ -122,6 +121,10 @@ class RefereeGroupSerializer(serializers.ModelSerializer):
 class ScoreSerializer(serializers.ModelSerializer):
 
     sport_man_name = serializers.ReadOnlyField(source="sport_man.name")
+    sport_man_team = serializers.ReadOnlyField(source="sport_man.team.name")
+    group_num = serializers.ReadOnlyField(source="group.num")
+    group_level = serializers.ReadOnlyField(source="group.num")
+
     team_name = serializers.ReadOnlyField(source="sport_man.team.name")
 
     class Meta:

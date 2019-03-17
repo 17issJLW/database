@@ -755,6 +755,14 @@ class GradeTheSport(APIView):
         else:
             raise BadRequest
 
+class CheckGrade(APIView):
+
+    @check_referee_token
+    def get(self,request, group_id):
+        score = Score.objects.filter(group__id=group_id)
+        pass
+
+
 class ConfirmGrade(APIView):
 
     @check_referee_token
@@ -765,8 +773,7 @@ class ConfirmGrade(APIView):
             group_id = []
             for i in group_list:
                 group_id.append(i.group)
-
-            pass
+            g
         else:
             return Response({"message":"您不是小组总裁判"})
 
