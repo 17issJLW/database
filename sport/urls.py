@@ -46,6 +46,8 @@ urlpatterns = [
 
     path('referee_grade/', GradeTheSport.as_view(), name="GradeTheSport"),
     path('get_sport_man/', GetSportMan.as_view(), name="GetSportMan"),
+    path('grade_sport/', GradeTheSport.as_view(), name="GradeTheSport"),
+
 
 
 ]

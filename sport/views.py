@@ -635,7 +635,7 @@ class ChangeRefereeGroupView(APIView):
     @check_token
     def get(self, request):
         group = RefereeGroup.objects.all()
-        serializer = RefereeGroupSerializer(group)
+        serializer = RefereeGroupSerializer(group,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @check_token
@@ -686,7 +686,7 @@ class StartGame(APIView):
     @check_token
     def get(self,request):
         queryset = Group.objects.all()
-        serializer = GroupSerializer(queryset)
+        serializer = GroupSerializer(queryset,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
     @check_token
@@ -714,14 +714,48 @@ class GradeTheSport(APIView):
         group_id = []
         for group in group_list:
             group_id.append(group.get("id"))
-        people = SportMan.objects.filter(competition_group__id__in=group_id)
-        serializer = SportManSerializer(people, many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        group = Group.objects.filter(pk__in=group_id)
+        serializer = GroupSerializer(group, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     @check_referee_token
     def post(self, request):
         username = request.META.get("REMOTE_USER").get("username")
         referee = Referee.objects.filter(username=username).first()
+        data = request.data
+        if data["group"] and data["sport_man"] and data["grade"]:
+            group = Group.objects.filter(pk=data["group"]).first()
+            sport_man = SportMan.objects.filter(pk=data["sport_man"]).first()
+            if not group or not sport_man:
+                raise NotFound
+
+            score = Score.objects.filter(
+                referee__id=referee.id,
+                group__id=data["group"],
+                sport_man__id=data["sport_man"],
+            ).first()
+            if score:
+                score.grade = data["grade"]
+                score.save()
+            else:
+                Score.objects.create(
+                    referee=referee,
+                    group=group,
+                    sport_man=sport_man,
+                    score=data["score"]
+                )
+            count = Score.objects.filter(group__id=data["group"]).count()
+            if count >= 5:
+                group.status = "待审核"
+                group.save()
+            return Response({"ok"}, status=status.HTTP_200_OK)
+        else:
+            raise BadRequest
+
+
+
+
 
 
 

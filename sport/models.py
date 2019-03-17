@@ -208,6 +208,7 @@ class Score(models.Model):
     class Meta:
         verbose_name = '打分表'
         verbose_name_plural = '打分表'
+        unique_together = ["referee", "group", "sport_man"]
 
 
 
