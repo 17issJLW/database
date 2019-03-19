@@ -66,7 +66,7 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_people(self,obj):
-        people = obj.sport_man.all().values("id","name","id_number","age","sex","team__name")
+        people = obj.sport_man.all().values("id","name","id_number","age","sex","team__name", "number")
         return list(people)
 
 class SportManSerializer(serializers.ModelSerializer):
@@ -122,10 +122,18 @@ class ScoreSerializer(serializers.ModelSerializer):
 
     sport_man_name = serializers.ReadOnlyField(source="sport_man.name")
     sport_man_team = serializers.ReadOnlyField(source="sport_man.team.name")
-    group_num = serializers.ReadOnlyField(source="group.num")
-    group_level = serializers.ReadOnlyField(source="group.num")
 
-    team_name = serializers.ReadOnlyField(source="sport_man.team.name")
+    group_id = serializers.ReadOnlyField(source="group.id")
+    group_num = serializers.ReadOnlyField(source="group.num")
+    group_level = serializers.ReadOnlyField(source="group.level")
+
+    competition_name = serializers.ReadOnlyField(source="group.competition.name")
+    competition_sex = serializers.ReadOnlyField(source="group.competition.sex")
+    competition_age_group = serializers.ReadOnlyField(source="group.competition.age_group")
+
+    referee_id = serializers.ReadOnlyField(source="referee.id")
+    referee_name = serializers.ReadOnlyField(source="referee.name")
+
 
     class Meta:
         model = Score

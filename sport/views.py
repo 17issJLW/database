@@ -570,6 +570,16 @@ class GetSportMan(APIView):
         serializer = SportManGroupSerializer(queryset,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
+class GetAllSportMan(APIView):
+
+    @check_token
+    def get(self,request):
+        queryset = SportMan.objects.filter(team__isnull=False)
+        page = Pagination()
+        result = page.paginate_queryset(queryset=queryset, request=request, view=self)
+        serializer = SportManSerializer(result, many=True)
+        return page.get_paginated_response(serializer.data)
+
 
 class RefereeUpdate(APIView):
 
@@ -811,14 +821,41 @@ class ConfirmGrade(APIView):
     @check_referee_token
     def get(self,request):
         username = request.META.get("REMOTE_USER").get("username")
-        group_list = RefereeGroup.objects.filter(referee__username=username, is_leader=True)
+        group_list = RefereeGroup.objects.filter(referee__username=username, is_leader=True, group__status="待审核")
         if group_list:
             group_id = []
             for i in group_list:
-                group_id.append(i.group)
-            pass
+                group_id.append(i.group.id)
+            score_list = Score.objects.filter(group__id__in=group_id).order_by("group")
+            serializer = ScoreSerializer(score_list,many=True)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+
         else:
             return Response({"message":"您不是小组总裁判"})
+
+
+    @check_referee_token
+    def post(self,request):
+        username = request.META.get("REMOTE_USER").get("username")
+        data = request.data
+        leader = RefereeGroup.objects.filter(referee__username=username,group__id=data["group"], is_leader=True)
+        if not leader:
+            raise PermissionDeny
+        score = Score.objects.filter(group__id=data["group"]).update(is_pass=True)
+        group = Group.objects.filter(pk=data["group"]).update(status="已确认")
+        return Response({"message":"confirm"},status=status.HTTP_200_OK)
+
+    @check_referee_token
+    def delete(self, request, group_id, referee_id):
+        username = request.META.get("REMOTE_USER").get("username")
+        leader = RefereeGroup.objects.filter(referee__username=username, group__id=group_id, is_leader=True)
+        if not leader:
+            raise PermissionDeny
+        group = Group.objects.filter(pk=group_id).update(status="待打分")
+        score = Score.objects.filter(group__id=group_id, referee__id=referee_id).delete()
+        return Response({"message":"delete"},status=status.HTTP_200_OK)
+
+
 
 
 
