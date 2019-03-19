@@ -46,6 +46,7 @@ urlpatterns = [
 
     path('referee_grade/', GradeTheSport.as_view(), name="GradeTheSport"),
     path('get_sport_man/', GetSportMan.as_view(), name="GetSportMan"),
+    path('get_all_sport_man/', GetAllSportMan.as_view(), name="GetAllSportMan"),
     path('grade_sport/', GradeTheSport.as_view(), name="GradeTheSport"),
 
     path('arrange/', Arrange.as_view(), name="Arrange")
