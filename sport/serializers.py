@@ -66,7 +66,7 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_people(self,obj):
-        people = obj.sport_man.all().values()
+        people = obj.sport_man.all().values("id","name","id_number","age","sex","team__name")
         return list(people)
 
 class SportManSerializer(serializers.ModelSerializer):

@@ -48,6 +48,8 @@ urlpatterns = [
     path('get_sport_man/', GetSportMan.as_view(), name="GetSportMan"),
     path('grade_sport/', GradeTheSport.as_view(), name="GradeTheSport"),
 
+    path('arrange/', Arrange.as_view(), name="Arrange")
+
 
 
 ]

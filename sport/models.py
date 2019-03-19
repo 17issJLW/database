@@ -74,6 +74,7 @@ class SportMan(models.Model):
     age_group = models.CharField(verbose_name="组别",default="7-8岁",choices=AGEGROUP,max_length=32)
     grade = models.FloatField(verbose_name="文化分数", blank=True, null=True)
     team = models.ForeignKey("Team", verbose_name="所属代表队",blank=True,null=True,on_delete=models.SET_NULL,related_name='sport_man_team')
+    number = models.IntegerField(verbose_name="运动员号码", unique=True, blank=True, null=True)
     competition_group = models.ManyToManyField("Group", verbose_name="报名分组", through='SportManGroup', through_fields=("sid", "gid"), related_name='sport_man')
 
     # phone = models.CharField(verbose_name="手机号码", max_length=32,blank=True, null=True)
@@ -152,11 +153,6 @@ class SportManGroup(models.Model):
     sid = models.ForeignKey("SportMan",blank=True, null=True, on_delete=models.SET_NULL)
     gid = models.ForeignKey("Group",blank=True, null=True, on_delete=models.SET_NULL)
     # competition = models.ForeignKey("Competition", verbose_name="比赛项目", on_delete=models.CASCADE)
-    grade1 = models.FloatField(verbose_name="得分1",blank=True,null=True)
-    grade2 = models.FloatField(verbose_name="得分2",blank=True,null=True)
-    grade3 = models.FloatField(verbose_name="得分3",blank=True,null=True)
-    grade4 = models.FloatField(verbose_name="得分4",blank=True,null=True)
-    grade5 = models.FloatField(verbose_name="得分5",blank=True,null=True)
     total_grade = models.FloatField(verbose_name="最终得分", blank=True, null=True)
 
     class Meta:

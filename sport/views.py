@@ -653,6 +653,7 @@ class ChangeRefereeGroupView(APIView):
         # try:
         for i in people:
             referee_group = RefereeGroup.objects.filter(group__id=group_id, referee__id=i).first()
+
             if referee_group:
                 pass
             else:
@@ -662,6 +663,9 @@ class ChangeRefereeGroupView(APIView):
         return Response({"ok"},status=status.HTTP_200_OK)
         # except:
         #     raise UnknowError
+
+
+
 
     @check_token
     def delete(self,request,people_id,group_id):
@@ -704,6 +708,45 @@ class StartGame(APIView):
             return Response({"message":group_id}, status=status.HTTP_200_OK)
         else:
             raise NotFound
+
+class Arrange(APIView):
+
+    @check_token
+    def post(self, request):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        host = request.data.get("host")
+        if not host:
+            raise BadRequest
+        man = 1
+        woman = 0
+        sport_man = SportMan.objects.filter(team__isnull=False)
+        for person in sport_man:
+            if person.team.id == host:
+                continue
+            if person.sex == "男":
+                person.number = man
+                person.save()
+                man = man + 2
+            elif person.sex == "女":
+                person.number = woman
+                person.save()
+                woman = woman + 2
+        host_people = SportMan.objects.filter(team__id=host)
+        for person in host_people:
+            if person.sex == "男":
+                person.number = man
+                person.save()
+                man = man + 2
+            elif person.sex == "女":
+                person.number = woman
+                person.save()
+                woman = woman + 2
+
+        return Response({"message":"ok"},status=status.HTTP_200_OK)
+
+
 
 
 class GradeTheSport(APIView):
@@ -768,7 +811,7 @@ class ConfirmGrade(APIView):
     @check_referee_token
     def get(self,request):
         username = request.META.get("REMOTE_USER").get("username")
-        group_list = RefereeGroup.objects.filter(referee__username=username,is_leader=True)
+        group_list = RefereeGroup.objects.filter(referee__username=username, is_leader=True)
         if group_list:
             group_id = []
             for i in group_list:
