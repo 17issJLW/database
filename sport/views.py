@@ -574,7 +574,7 @@ class GetAllSportMan(APIView):
 
     @check_token
     def get(self,request):
-        queryset = SportMan.objects.filter(team__isnull=False)
+        queryset = SportMan.objects.filter(team__isnull=False).order_by("number")
         page = Pagination()
         result = page.paginate_queryset(queryset=queryset, request=request, view=self)
         serializer = SportManSerializer(result, many=True)
