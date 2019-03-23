@@ -50,7 +50,7 @@ class CoachSerializer(serializers.ModelSerializer):
     team_name = serializers.ReadOnlyField(source="team.name")
 
     class Meta:
-        model = LeaderAndDoctor
+        model = Coach
         fields = "__all__"
 
 class GroupSerializer(serializers.ModelSerializer):
