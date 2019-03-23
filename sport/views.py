@@ -350,7 +350,7 @@ class CoachView(APIView):
             data = serializer.validated_data
             coach = Coach.objects.create(
                 name=data.get("name"),
-                id_number=data.get("id_number"),
+                id_number=str(data.get("id_number")),
                 phone=data.get("phone"),
                 team=team
             )
