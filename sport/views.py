@@ -555,9 +555,9 @@ class SignUpView(APIView):
 
 
     @check_team_token
-    def delete(self,request,sport_group_id):
+    def delete(self,request,people_id):
         username = request.META.get("REMOTE_USER").get("username")
-        sport_man_group = SportManGroup.objects.filter(pk=sport_group_id,sid__team__username=username).first()
+        sport_man_group = SportManGroup.objects.filter(pk=people_id, sid__team__username=username).first()
         if sport_man_group:
             sport_man_group.delete()
         else:

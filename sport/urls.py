@@ -36,7 +36,7 @@ urlpatterns = [
 
     path('sign_up/', SignUpView.as_view(), name="SignUpView"),
     path('sign_up/<int:people_id>/', SignUpView.as_view(), name="SignUpView"),
-    path('sign_up/<int:sport_group_id>/', SignUpView.as_view(), name="SignUpView"),
+    # path('sign_up/<int:sport_group_id>/', SignUpView.as_view(), name="SignUpView"),
 
     path('change_group/', ChangeGroupView.as_view(), name="ChangeGroupView"),
     path('change_referee_group/', ChangeRefereeGroupView.as_view(), name="ChangeRefereeGroupView"),
