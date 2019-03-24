@@ -560,6 +560,7 @@ class SignUpView(APIView):
         sport_man_group = SportManGroup.objects.filter(pk=people_id, sid__team__username=username).first()
         if sport_man_group:
             sport_man_group.delete()
+            return Response({"ok"},status=status.HTTP_200_OK)
         else:
             raise NotFound
 
