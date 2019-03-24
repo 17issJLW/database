@@ -532,15 +532,15 @@ class SignUpView(APIView):
 
 
     @check_team_token
-    def put(self,request,people_id):
+    def put(self,request, people_id):
         username = request.META.get("REMOTE_USER").get("username")
         request_data = request.data
-        sport_man = SportMan.objects.filter(pk=people_id,team__username=username).first()
+        sport_man = SportMan.objects.filter(pk=people_id, team__username=username).first()
         competition = Competition.objects.filter(pk=request_data.get("competition")).first()
         if not sport_man or not competition:
             raise NotFound
         if sport_man.sex == competition.sex and sport_man.age_group == competition.age_group:
-            if SportManGroup.objects.filter(sid__team__username=username,gid__competition__id=request_data.get("competition")).count() >= 6:
+            if SportManGroup.objects.filter(sid__team__username=username, gid__competition__age_group=sport_man.age_group, gid__competition__sex=sport_man.sex).count() >= 6:
                 raise TooManyPeople
             group,success = Group.objects.get_or_create(num=0, competition=competition, level="初赛")
             sport_man_group = SportManGroup.objects.create(sid=sport_man, gid=group)
