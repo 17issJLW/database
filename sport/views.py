@@ -543,7 +543,11 @@ class SignUpView(APIView):
             if SportManGroup.objects.filter(sid__team__username=username, gid__competition__age_group=sport_man.age_group, gid__competition__sex=sport_man.sex).count() >= 6:
                 raise TooManyPeople
             group,success = Group.objects.get_or_create(num=0, competition=competition, level="初赛")
-            sport_man_group = SportManGroup.objects.create(sid=sport_man, gid=group)
+            sport_man_group = SportManGroup.objects.filter(sid=sport_man, gid=group).first()
+            if sport_man_group:
+                raise Repetition
+            else:
+                sport_man_group = SportManGroup.objects.create(sid=sport_man, gid=group)
             serializer = SportManGroupSerializer(sport_man_group)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
@@ -551,12 +555,9 @@ class SignUpView(APIView):
 
 
     @check_team_token
-    def delete(self,request,people_id,competition_id):
+    def delete(self,request,sport_group_id):
         username = request.META.get("REMOTE_USER").get("username")
-        sport_man = SportMan.objects.filter(pk=people_id, team__username=username).first()
-        if not sport_man:
-            raise NotFound
-        sport_man_group = SportManGroup.objects.filter(sid__id=people_id, gid__competition__id=competition_id).first()
+        sport_man_group = SportManGroup.objects.filter(pk=sport_group_id,sid__team__username=username).first()
         if sport_man_group:
             sport_man_group.delete()
         else:

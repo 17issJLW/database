@@ -42,6 +42,10 @@ class TooManyPeople(APIException):
     status_code = 422
     default_detail = "当前代表队报名人数过多"
 
+class Repetition(APIException):
+    status_code = 423
+    default_detail = "该运动员已经报过名了"
+
 class NotMatch(APIException):
     status_code = 422
     default_detail = "类别与运动员不匹配"
