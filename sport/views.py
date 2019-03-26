@@ -29,12 +29,12 @@ class UserLogin(APIView):
         if type == "team":
             queryset = Team.objects.filter(username=username).first()
             serializer = TeamSerializer(queryset)
-            return Response(serializer.data.update({"type":"team"}))
+            return Response({"type":"team"}.update(serializer.data))
 
         if type == "referee":
             queryset = Referee.objects.filter(username=username).first()
             serializer = RefereeSerializer(queryset)
-            return Response(serializer.data.update({"type":"referee"}))
+            return Response(serializer.data)
 
         if type == "admin":
             return Response({"username":"admin","type":"admin"})
@@ -857,6 +857,8 @@ class ConfirmGrade(APIView):
     def post(self,request):
         username = request.META.get("REMOTE_USER").get("username")
         data = request.data
+        if not data["D"] or not data["P"]:
+            raise BadRequest
         leader = RefereeGroup.objects.filter(referee__username=username,group__id=data["group"], is_leader=True)
         if not leader:
             raise PermissionDeny
