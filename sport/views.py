@@ -29,10 +29,7 @@ class UserLogin(APIView):
         if type == "team":
             queryset = Team.objects.filter(username=username).first()
             serializer = TeamSerializer(queryset)
-            team_type = {"type": "team"}
-            team_data = dict(serializer.data)
-            result = team_type.update(team_data)
-            return Response(result)
+            return Response(serializer.data)
 
         if type == "referee":
             queryset = Referee.objects.filter(username=username).first()
