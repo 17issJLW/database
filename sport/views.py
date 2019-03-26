@@ -29,12 +29,12 @@ class UserLogin(APIView):
         if type == "team":
             queryset = Team.objects.filter(username=username).first()
             serializer = TeamSerializer(queryset)
-            return Response(serializer.data)
+            return Response(serializer.data.update({"type":"team"}))
 
         if type == "referee":
             queryset = Referee.objects.filter(username=username).first()
             serializer = RefereeSerializer(queryset)
-            return Response(serializer.data)
+            return Response(serializer.data.update({"type":"referee"}))
 
         if type == "admin":
             return Response({"username":"admin","type":"admin"})
@@ -677,6 +677,22 @@ class ChangeRefereeGroupView(APIView):
         #     raise UnknowError
 
 
+    @check_token
+    def put(self,request,people_id, group_id):
+        type = request.META.get("REMOTE_USER").get("type")
+        if type != "admin":
+            raise PermissionDeny
+        referee_group = RefereeGroup.objects.filter(referee__id=people_id,group__id=group_id).first()
+        leader = RefereeGroup.objects.filter(group__id=group_id,is_leader=True).exists()
+        if leader:
+            raise Repetition(detail="该组已经有总裁判了")
+        if referee_group:
+            referee_group.is_leader = True
+            referee_group.save()
+            return Response({"message":"ok"}, status=status.HTTP_200_OK)
+        else:
+            raise NotFound
+
 
 
     @check_token
@@ -686,7 +702,7 @@ class ChangeRefereeGroupView(APIView):
             raise PermissionDeny
         referee_group = RefereeGroup.objects.filter(group__id=group_id, referee__id=people_id)
         referee_group.delete()
-        return Response({"ok"},status=status.HTTP_200_OK)
+        return Response({"ok"}, status=status.HTTP_200_OK)
 
 
 class GetAllReferee(APIView):
@@ -794,6 +810,7 @@ class GradeTheSport(APIView):
             ).first()
             if score:
                 score.grade = data["grade"]
+                score.status = "待审核"
                 score.save()
             else:
                 Score.objects.create(
@@ -833,7 +850,7 @@ class ConfirmGrade(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
 
         else:
-            return Response({"message":"您不是小组总裁判"})
+            return Response({"message":"您没有需要审核的组"})
 
 
     @check_referee_token
@@ -843,7 +860,7 @@ class ConfirmGrade(APIView):
         leader = RefereeGroup.objects.filter(referee__username=username,group__id=data["group"], is_leader=True)
         if not leader:
             raise PermissionDeny
-        score = Score.objects.filter(group__id=data["group"]).update(is_pass=True)
+        score = Score.objects.filter(group__id=data["group"]).update(status="已确认")
         group = Group.objects.filter(pk=data["group"]).update(status="已确认")
         return Response({"message":"confirm"},status=status.HTTP_200_OK)
 
@@ -854,8 +871,8 @@ class ConfirmGrade(APIView):
         if not leader:
             raise PermissionDeny
         group = Group.objects.filter(pk=group_id).update(status="待打分")
-        score = Score.objects.filter(group__id=group_id, referee__id=referee_id).delete()
-        return Response({"message":"delete"},status=status.HTTP_200_OK)
+        score = Score.objects.filter(group__id=group_id, referee__id=referee_id).update(status="重新打分")
+        return Response({"message":"ok"},status=status.HTTP_200_OK)
 
 
 

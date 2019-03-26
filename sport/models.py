@@ -195,11 +195,16 @@ class RefereeGroup(models.Model):
 
 
 class Score(models.Model):
+    STATUS = (
+        ("重新打分", "重新打分"),
+        ("待审核", "待审核"),
+        ("已确认", "已确认"),
+    )
     referee = models.ForeignKey(Referee, verbose_name="裁判", blank=True, null=True, on_delete=models.SET_NULL)
     group = models.ForeignKey(Group, verbose_name="赛事分组", blank=True, null=True, on_delete=models.SET_NULL)
     sport_man = models.ForeignKey(SportMan, verbose_name="运动员",blank=True, null=True, on_delete=models.SET_NULL)
     grade = models.FloatField()
-    is_pass = models.BooleanField(default=True, verbose_name="是否通过")
+    status = models.CharField(verbose_name="状态", max_length=32, default="待审核", choices=STATUS)
 
     class Meta:
         verbose_name = '打分表'
