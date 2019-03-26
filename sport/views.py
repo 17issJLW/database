@@ -683,9 +683,9 @@ class ChangeRefereeGroupView(APIView):
         if type != "admin":
             raise PermissionDeny
         referee_group = RefereeGroup.objects.filter(referee__id=people_id,group__id=group_id).first()
-        leader = RefereeGroup.objects.filter(group__id=group_id,is_leader=True).exists()
+        leader = RefereeGroup.objects.filter(group__id=group_id,is_leader=True)
         if leader:
-            raise Repetition(detail="该组已经有总裁判了")
+            leader.update(is_leader=False)
         if referee_group:
             referee_group.is_leader = True
             referee_group.save()
