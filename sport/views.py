@@ -31,7 +31,7 @@ class UserLogin(APIView):
             serializer = TeamSerializer(queryset)
             team_type = {"type": "team"}
             team_data = dict(serializer.data)
-            result = team_data.update(team_type)
+            result = team_type.update(team_data)
             return Response(result)
 
         if type == "referee":
