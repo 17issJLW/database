@@ -111,7 +111,8 @@ class SportManGroupSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class RefereeGroupSerializer(serializers.ModelSerializer):
-    # referee = serializers.ReadOnlyField(source="referee")
+    # referee_id = serializers.ReadOnlyField(source="referee.id")
+    # referee_name = serializers.ReadOnlyField(source="referee.name")
     # group = serializers.ReadOnlyField(source="group")
     team_name = serializers.ReadOnlyField(source="referee.team.name")
 
