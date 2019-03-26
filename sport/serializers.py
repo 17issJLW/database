@@ -3,6 +3,7 @@ from .models import *
 
 class TeamSerializer(serializers.ModelSerializer):
 
+    type = serializers.ReadOnlyField(default="team")
 
     class Meta:
         model = Team
