@@ -29,7 +29,7 @@ class AllRefereeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_group_list(self, obj):
-        group = obj.group_set.all().values()
+        group = obj.refereegroup_set.all().values()
         return list(group)
 
 
