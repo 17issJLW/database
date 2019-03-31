@@ -710,7 +710,7 @@ class GetAllReferee(APIView):
     @check_token
     def get(self, request):
         referee = Referee.objects.all()
-        serializer = RefereeSerializer(referee,many=True)
+        serializer = AllRefereeSerializer(referee, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class StartGame(APIView):

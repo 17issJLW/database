@@ -13,10 +13,24 @@ class TeamSerializer(serializers.ModelSerializer):
 class RefereeSerializer(serializers.ModelSerializer):
     team_name = serializers.ReadOnlyField(source="team.name")
 
+    class Meta:
+        model = Referee
+        fields = "__all__"
+
+
+
+class AllRefereeSerializer(serializers.ModelSerializer):
+    team_name = serializers.ReadOnlyField(source="team.name")
+    group_list = serializers.SerializerMethodField(read_only=True)
+
 
     class Meta:
         model = Referee
         fields = "__all__"
+
+    def get_group_list(self, obj):
+        group = obj.group_set.all().values()
+        return list(group)
 
 
 class CompetitionSerializer(serializers.ModelSerializer):
