@@ -48,9 +48,10 @@ urlpatterns = [
     path('get_sport_man/', GetSportMan.as_view(), name="GetSportMan"),
     path('get_all_sport_man/', GetAllSportMan.as_view(), name="GetAllSportMan"),
     path('grade_sport/', GradeTheSport.as_view(), name="GradeTheSport"),
+    path('confirm_grade/',ConfirmGrade.as_view(), name='ConfirmGrade'),
 
-    path('arrange/', Arrange.as_view(), name="Arrange")
+    path('arrange/', Arrange.as_view(), name="Arrange"),
 
-
+    path('rank/', Rank.as_view(), name="Rank"),
 
 ]

@@ -3,6 +3,7 @@ from rest_framework.views import APIView, status,Response
 from lib.rest_framework.util import *
 from lib.rest_framework.permissions import check_token,check_team_token,check_referee_token
 from rest_framework.pagination import PageNumberPagination
+from django.db.models import Avg,Min,Max,Sum,Q
 
 
 from .models import *
@@ -731,6 +732,10 @@ class StartGame(APIView):
         if group:
             if group.status != "未开始":
                 raise StatusError
+            if RefereeGroup.objects.filter(group__id=group_id).count() < 3:
+                raise TooLessReferee
+            if not RefereeGroup.objects.filter(group__id=group_id,is_leader=True):
+                raise NoRefereeLeader
             group.status = "待打分"
             group.save()
             return Response({"message":group_id}, status=status.HTTP_200_OK)
@@ -817,7 +822,7 @@ class GradeTheSport(APIView):
                     referee=referee,
                     group=group,
                     sport_man=sport_man,
-                    score=data["score"]
+                    score=data["grade"]
                 )
             count = Score.objects.filter(group__id=data["group"]).count()
             if count >= 5:
@@ -857,26 +862,38 @@ class ConfirmGrade(APIView):
     def post(self,request):
         username = request.META.get("REMOTE_USER").get("username")
         data = request.data
-        if not data["D"] or not data["P"]:
+        if not data["D"] or not data["P"] or not data["people_id"] or not data["group"]:
             raise BadRequest
         leader = RefereeGroup.objects.filter(referee__username=username,group__id=data["group"], is_leader=True)
         if not leader:
             raise PermissionDeny
-        score = Score.objects.filter(group__id=data["group"]).update(status="已确认")
-        group = Group.objects.filter(pk=data["group"]).update(status="已确认")
-        return Response({"message":"confirm"},status=status.HTTP_200_OK)
+        score = Score.objects.filter(group__id=data["group"], sport_man__id=data["people_id"])
+        score.update(status="已确认")
+        score_dict = score.annotate(score_sum=Sum('grade'), score_max=Max('grade'), score_min=Min('grade'))
+        score_avg = (score_dict["score_sum"]-score_dict["score_max"]-score_dict["score_min"])/ \
+                    (score.count()-2) * score.count() + float(data["D"]) - float(data["P"])
+        SportManGroup.objects.filter(sid__id=data["people_id"], gid__id=data["group"])
+        if not Score.objects.filter(Q(status='待审核') | Q(status='重新打分'), group__id=data["group"] ): #     如果没有待审核，则该组为已确认
+            Group.objects.filter(pk=data["group"]).update(status="已确认")
+
+        return Response({"message":"confirm", "score":score_avg},status=status.HTTP_200_OK)
 
     @check_referee_token
-    def delete(self, request, group_id, referee_id):
+    def delete(self, request, group_id, referee_id,people_id):
         username = request.META.get("REMOTE_USER").get("username")
         leader = RefereeGroup.objects.filter(referee__username=username, group__id=group_id, is_leader=True)
         if not leader:
             raise PermissionDeny
         group = Group.objects.filter(pk=group_id).update(status="待打分")
-        score = Score.objects.filter(group__id=group_id, referee__id=referee_id).update(status="重新打分")
+        score = Score.objects.filter(group__id=group_id, referee__id=referee_id,sport_man__id=people_id).update(status="重新打分")
         return Response({"message":"ok"},status=status.HTTP_200_OK)
 
+class Rank(APIView):
 
+    def get(self,request):
+        sport_man = SportManGroup.objects.filter(gid__status="已确认").order_by("gid__id","gid__num","total_grade")
+        serializer = SportManGroupSerializer(sport_man, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 
 

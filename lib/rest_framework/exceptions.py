@@ -57,3 +57,11 @@ class UnknowError(APIException):
 class StatusError(APIException):
     status_code = 422
     default_detail = "比赛已经开始了"
+
+class TooLessReferee(APIException):
+    status_code = 422
+    default_detail = "裁判数不足3人"
+
+class NoRefereeLeader(APIException):
+    status_code = 422
+    default_detail = "该组没有裁判长"
