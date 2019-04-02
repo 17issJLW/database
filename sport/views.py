@@ -822,7 +822,7 @@ class GradeTheSport(APIView):
                     referee=referee,
                     group=group,
                     sport_man=sport_man,
-                    score=float(data["grade"])
+                    grade=float(data["grade"])
                 )
             count = Score.objects.filter(group__id=data["group"]).count()
             if count >= 5:
