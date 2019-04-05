@@ -166,7 +166,7 @@ class SportManGradeSerializer(serializers.Serializer):
     age = serializers.IntegerField()
     sex = serializers.CharField()
     number = serializers.SerializerMethodField()
-    team = serializers.CharField()
+    team = serializers.CharField(source="team.name")
 
     def get_number(self, obj):
         num = str(obj.number)
