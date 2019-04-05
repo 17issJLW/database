@@ -836,7 +836,7 @@ class SportManGrade(APIView):
 
     @check_referee_token
     def get(self,request, group_id):
-        sport_man = SportMan.objects.raw("""select sport_sportman.id,name,id_number,age,sex,age_group,sport_score.status,sport_score.grade,team_id
+        sport_man = models.Model.objects.raw("""select sport_sportman.id,name,id_number,age,sex,age_group,sport_score.status,sport_score.grade,team_id
                                             from sport_sportmangroup
                                             left join sport_score on sport_sportmangroup.sid_id = sport_score.sport_man_id
                                             left join sport_sportman on sport_sportmangroup.sid_id = sport_sportman.id
