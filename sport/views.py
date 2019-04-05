@@ -836,9 +836,11 @@ class SportManGrade(APIView):
 
     @check_referee_token
     def get(self,request, group_id):
-        sport_man = SportMan.objects.raw("""select * from sport_sportman
-                                            left join sport_score
-                                            where sport_sportman.group_id=%s and sport_score.status not null 
+        sport_man = SportMan.objects.raw("""select name,id_number,age,sex,age_group,status,sport_score.grade,team_id
+                                            from sport_sportmangroup
+                                            left join sport_score on sport_sportmangroup.sid_id = sport_score.sport_man_id
+                                            left join sport_sportman on sport_sportmangroup.sid_id = sport_sportman.id
+                                            where sport_sportmangroup.gid_id=%s
                                             """, [group_id])
         serializer = SportManGradeSerializer(sport_man, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
