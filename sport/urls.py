@@ -52,6 +52,8 @@ urlpatterns = [
 
     path('arrange/', Arrange.as_view(), name="Arrange"),
 
+    path('score/<int:grade_id>', SportManGrade.as_view(), name="SportManGrade"),
+
     path('rank/', Rank.as_view(), name="Rank"),
 
 ]

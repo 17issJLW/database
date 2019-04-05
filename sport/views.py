@@ -832,12 +832,14 @@ class GradeTheSport(APIView):
         else:
             raise BadRequest
 
-class CheckGrade(APIView):
+class SportManGrade(APIView):
 
     @check_referee_token
     def get(self,request, group_id):
-        score = Score.objects.filter(group__id=group_id)
-        pass
+        score = Score.objects.filter(Q(status='待审核') | Q(status='重新打分'), group__id=group_id)
+        serializer = ScoreSerializer(score, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class ConfirmGrade(APIView):
