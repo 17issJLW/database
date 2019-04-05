@@ -161,7 +161,13 @@ class SportManGradeSerializer(serializers.Serializer):
     grade = serializers.FloatField()
     status = serializers.CharField()
     id = serializers.IntegerField()
+    name = serializers.CharField()
+    id_number = serializers.CharField()
+    age = serializers.IntegerField()
+    sex = serializers.CharField()
+    number = serializers.SerializerMethodField()
+    team = serializers.CharField()
 
-    # class Meta:
-    #     model = SportMan
-    #     fields = ("id","name","id_number","age","sex","number","team__name")
+    def get_number(self, obj):
+        num = str(obj)
+        return num.zfill(3)
