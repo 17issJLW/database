@@ -171,3 +171,8 @@ class SportManGradeSerializer(serializers.Serializer):
     def get_number(self, obj):
         num = str(obj.number)
         return num.zfill(3)
+
+    def get_status(self, obj):
+        if obj.status == None:
+            return "待打分"
+        return obj.status
