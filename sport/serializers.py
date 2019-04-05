@@ -169,5 +169,5 @@ class SportManGradeSerializer(serializers.Serializer):
     team = serializers.CharField()
 
     def get_number(self, obj):
-        num = str(obj)
+        num = str(obj.number)
         return num.zfill(3)
