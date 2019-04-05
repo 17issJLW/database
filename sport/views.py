@@ -839,13 +839,14 @@ class SportManGrade(APIView):
         username = request.META.get("REMOTE_USER").get("username")
         referee = Referee.objects.filter(username=username).first()
         referee_id = referee.id
-        sport_man = SportMan.objects.raw("""select sport_sportman.id,name,id_number,age,sex,age_group,table2.status,table2.grade,team_id
+        sport_man = SportMan.objects.raw("""select sport_sportman.id,name,id_number,age,sex,number,table2.status,table2.grade,team_id
                                             from sport_sportmangroup
                                             left join(
                                               select * from sport_score where referee_id=%s and group_id=%s
                                             ) as table2 on sport_sportmangroup.sid_id = table2.sport_man_id 
                                             left join sport_sportman on sport_sportmangroup.sid_id = sport_sportman.id
                                             where sport_sportmangroup.gid_id=%s
+                                            order by number
                                             """, [referee_id, group_id, group_id])
         serializer = SportManGradeSerializer(sport_man, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
