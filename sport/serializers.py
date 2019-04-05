@@ -158,7 +158,7 @@ class ScoreSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class SportManGradeSerializer(serializers.ModelSerializer):
-    score = serializers.ReadOnlyField()
+    grade = serializers.ReadOnlyField()
     status = serializers.ReadOnlyField()
 
     class Meta:
