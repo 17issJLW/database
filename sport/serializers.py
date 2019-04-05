@@ -163,4 +163,4 @@ class SportManGradeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SportMan
-        fields = ("name","id_number","age","sex","number","team__name")
+        fields = ("id","name","id_number","age","sex","number","team__name")
