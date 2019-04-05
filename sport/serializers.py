@@ -159,7 +159,7 @@ class ScoreSerializer(serializers.ModelSerializer):
 
 class SportManGradeSerializer(serializers.Serializer):
     grade = serializers.FloatField()
-    status = serializers.CharField()
+    status = serializers.SerializerMethodField()
     id = serializers.IntegerField()
     name = serializers.CharField()
     id_number = serializers.CharField()
