@@ -896,11 +896,17 @@ class ConfirmGrade(APIView):
                             for k in data:
                                 if k["sport_man"] == j["sport_man"]:
                                     result[i][j["sport_man"]].append(k)
+            arr = []
+            for i in result:
+                arr.append(i)
 
 
 
 
-            return Response(result,status=status.HTTP_200_OK)
+
+
+
+            return Response(arr,status=status.HTTP_200_OK)
 
         else:
             return Response({"message":"您没有需要审核的组"})
