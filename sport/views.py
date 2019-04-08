@@ -866,7 +866,41 @@ class ConfirmGrade(APIView):
                 group_id.append(i.group.id)
             score_list = Score.objects.filter(group__id__in=group_id).order_by("group")
             serializer = ScoreSerializer(score_list,many=True)
-            return Response(serializer.data,status=status.HTTP_200_OK)
+            data = serializer.data
+            result = {}
+            group_list_id = []
+            sport_man = []
+            # for i in data:
+            #     group_list_id.append(i["group_id"])
+                # for j in data:
+                #     if j["group_id"] == i["group_id"]:
+                #         for k in data:
+                #
+                #         temp.append(j)
+                #
+                # result[i["group_id"]] = temp
+                # temp = []
+            for i in data:
+                group_list_id.append(i["group_id"])
+            group_list_id = list(set(group_list_id))
+            for i in group_list_id:
+                result[i] = {}
+                for j in data:
+                    if j["group_id"] == i:
+                        if result[i].__contains__(j["sport_man"]):
+                            for k in data:
+                                if k["sport_man"] == j["sport_man"]:
+                                    result[i][j["sport_man"]].append(k)
+                        else:
+                            result[i][j["sport_man"]] = []
+                            for k in data:
+                                if k["sport_man"] == j["sport_man"]:
+                                    result[i][j["sport_man"]].append(k)
+
+
+
+
+            return Response(result,status=status.HTTP_200_OK)
 
         else:
             return Response({"message":"您没有需要审核的组"})
