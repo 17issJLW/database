@@ -913,7 +913,7 @@ class ConfirmGrade(APIView):
 
 
 
-            return Response(result,status=status.HTTP_200_OK)
+            return Response({"result": result},status=status.HTTP_200_OK)
 
         else:
             return Response({"message":"您没有需要审核的组"})
