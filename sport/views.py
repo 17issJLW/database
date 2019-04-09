@@ -867,46 +867,53 @@ class ConfirmGrade(APIView):
             score_list = Score.objects.filter(group__id__in=group_id).order_by("group")
             serializer = ScoreSerializer(score_list,many=True)
             data = serializer.data
-            result = {}
+            result = []
             group_list_id = []
-            sport_man = []
-            # for i in data:
-            #     group_list_id.append(i["group_id"])
-                # for j in data:
-                #     if j["group_id"] == i["group_id"]:
-                #         for k in data:
-                #
-                #         temp.append(j)
-                #
-                # result[i["group_id"]] = temp
-                # temp = []
+
             for i in data:
                 group_list_id.append(i["group_id"])
             group_list_id = list(set(group_list_id))
+            # for i in group_list_id:
+            #     result[i] = {}
+            #     for j in data:
+            #         if j["group_id"] == i:
+            #             if result[i].__contains__(j["sport_man"]):
+            #                 for k in data:
+            #                     if k["sport_man"] == j["sport_man"]:
+            #                         result[i][j["sport_man"]].append(k)
+            #             else:
+            #                 result[i][j["sport_man"]] = []
+            #                 for k in data:
+            #                     if k["sport_man"] == j["sport_man"]:
+            #                         result[i][j["sport_man"]].append(k)
+
+
             for i in group_list_id:
-                result[i] = {}
                 for j in data:
                     if j["group_id"] == i:
-                        if result[i].__contains__(j["sport_man"]):
-                            for k in data:
-                                if k["sport_man"] == j["sport_man"]:
-                                    result[i][j["sport_man"]].append(k)
-                        else:
-                            result[i][j["sport_man"]] = []
-                            for k in data:
-                                if k["sport_man"] == j["sport_man"]:
-                                    result[i][j["sport_man"]].append(k)
-            arr = []
+                        j["sport_man"] = []
+                        result.append(j)
+                        break
             for i in result:
-                arr.append(i)
+                sport_man = []
+                for j in data:
+                    if j["group_id"] == i["group_id"]:
+                        if j["sport_man"] not in sport_man:
+                            j["referee_list"] = []
+                            i["sport_man"].append(j)
+                            sport_man.append(j["sport_man"])
+            for i in result:
+                for j in i["sport_man"]:
+                    for k in data:
+                        if k["sport_man"] == i["sport_man"] and k["group_id"] == i["group_id"]:
+                            j["referee_list"].append(k)
 
 
 
 
 
 
-
-            return Response(arr,status=status.HTTP_200_OK)
+            return Response(result,status=status.HTTP_200_OK)
 
         else:
             return Response({"message":"您没有需要审核的组"})
