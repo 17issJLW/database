@@ -49,7 +49,7 @@ urlpatterns = [
     path('get_all_sport_man/', GetAllSportMan.as_view(), name="GetAllSportMan"),
     path('grade_sport/', GradeTheSport.as_view(), name="GradeTheSport"),
     path('confirm_grade/',ConfirmGrade.as_view(), name='ConfirmGrade'),
-
+    path('confirm_grade/<int:group_id>/<int:referee_id>/<int:people_id>/',ConfirmGrade.as_view(), name='ConfirmGrade'),
     path('arrange/', Arrange.as_view(), name="Arrange"),
 
     path('score/<int:group_id>/', SportManGrade.as_view(), name="SportManGrade"),

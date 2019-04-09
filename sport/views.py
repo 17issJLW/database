@@ -873,19 +873,6 @@ class ConfirmGrade(APIView):
             for i in data:
                 group_list_id.append(i["group_id"])
             group_list_id = list(set(group_list_id))
-            # for i in group_list_id:
-            #     result[i] = {}
-            #     for j in data:
-            #         if j["group_id"] == i:
-            #             if result[i].__contains__(j["sport_man"]):
-            #                 for k in data:
-            #                     if k["sport_man"] == j["sport_man"]:
-            #                         result[i][j["sport_man"]].append(k)
-            #             else:
-            #                 result[i][j["sport_man"]] = []
-            #                 for k in data:
-            #                     if k["sport_man"] == j["sport_man"]:
-            #                         result[i][j["sport_man"]].append(k)
 
 
             # for i in group_list_id:
@@ -930,8 +917,25 @@ class ConfirmGrade(APIView):
         score_avg = (score_dict["score_sum"]-score_dict["score_max"]-score_dict["score_min"])/ \
                     (score.count()-2) * score.count() + float(data["D"]) - float(data["P"])
         SportManGroup.objects.filter(sid__id=data["people_id"], gid__id=data["group"])
-        if not Score.objects.filter(Q(status='待审核') | Q(status='重新打分'), group__id=data["group"] ): #     如果没有待审核，则该组为已确认
-            Group.objects.filter(pk=data["group"]).update(status="已确认")
+        #     如果没有待审核，则该组为已确认
+        if not Score.objects.filter(Q(status='待审核') | Q(status='重新打分'), group__id=data["group"] ):
+            group = Group.objects.filter(pk=data["group"]).first()
+            group.status = "已确认"
+            group.save()
+
+            count1 = Group.objects.filter(competition__id=group.competition_id, status="已确认").count()
+            count2 = Group.objects.filter(competition__id=group.competition_id).count()
+            if count1 == count2:
+                final_group = Group.objects.create(
+                    num=1,
+                    competition=group.competition,
+                    level="决赛",
+                    status="待打分"
+                )
+                top_sport_man = SportManGroup.objects.filter(gid__competition__id=group.competition_id, gid__status="已确认", gid__level="初赛").order_by("-total_grade")[:8]
+                for i in top_sport_man:
+                    SportManGroup.objects.create(sid=i.sid,gid=final_group)
+
 
         return Response({"message":"confirm", "score":score_avg},status=status.HTTP_200_OK)
 
