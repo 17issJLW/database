@@ -873,19 +873,19 @@ class ConfirmGrade(APIView):
             for i in data:
                 group_list_id.append(i["group_id"])
             group_list_id = list(set(group_list_id))
-            for i in group_list_id:
-                result[i] = []
-                for j in data:
-                    if j["group_id"] == i:
-                        if result[i].__contains__(j["sport_man"]):
-                            for k in data:
-                                if k["sport_man"] == j["sport_man"]:
-                                    result[i][j["sport_man"]].append(k)
-                        else:
-                            result[i][j["sport_man"]] = []
-                            for k in data:
-                                if k["sport_man"] == j["sport_man"]:
-                                    result[i][j["sport_man"]].append(k)
+            # for i in group_list_id:
+            #     result[i] = {}
+            #     for j in data:
+            #         if j["group_id"] == i:
+            #             if result[i].__contains__(j["sport_man"]):
+            #                 for k in data:
+            #                     if k["sport_man"] == j["sport_man"]:
+            #                         result[i][j["sport_man"]].append(k)
+            #             else:
+            #                 result[i][j["sport_man"]] = []
+            #                 for k in data:
+            #                     if k["sport_man"] == j["sport_man"]:
+            #                         result[i][j["sport_man"]].append(k)
 
 
             # for i in group_list_id:
@@ -909,11 +909,7 @@ class ConfirmGrade(APIView):
             #                 j["referee_list"].append(k)
             # print(result)
 
-
-
-
-
-            return Response({"result": list(result)},status=status.HTTP_200_OK)
+            return Response(serializer.data,status=status.HTTP_200_OK)
 
         else:
             return Response({"message":"您没有需要审核的组"})
