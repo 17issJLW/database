@@ -825,8 +825,9 @@ class GradeTheSport(APIView):
                     grade=float(data["grade"])
                 )
             count = Score.objects.filter(group__id=data["group"]).count()
+            referee_count = RefereeGroup.objects.filter(group__id=data["group"]).count()
             people_count = SportManGroup.objects.filter(gid__id=data["group"]).count()
-            if count >= people_count:
+            if count >= (people_count * referee_count):
                 group.status = "待审核"
                 group.save()
             return Response({"ok"}, status=status.HTTP_200_OK)
