@@ -859,7 +859,7 @@ class ConfirmGrade(APIView):
     @check_referee_token
     def get(self,request):
         username = request.META.get("REMOTE_USER").get("username")
-        group_list = RefereeGroup.objects.filter(referee__username=username, is_leader=True, group__status="待审核")
+        group_list = RefereeGroup.objects.filter(Q(group__status="待审核") | Q(group__status="重新打分"),referee__username=username, is_leader=True)
         if group_list:
             group_id = []
             for i in group_list:
@@ -952,7 +952,7 @@ class ConfirmGrade(APIView):
         leader = RefereeGroup.objects.filter(referee__username=username, group__id=group_id, is_leader=True)
         if not leader:
             raise PermissionDeny
-        group = Group.objects.filter(pk=group_id).update(status="待打分")
+        group = Group.objects.filter(pk=group_id).update(status="重新打分")
         score = Score.objects.filter(group__id=group_id, referee__id=referee_id,sport_man__id=people_id).update(status="重新打分")
         return Response({"message":"ok"},status=status.HTTP_200_OK)
 
