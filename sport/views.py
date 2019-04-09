@@ -788,7 +788,7 @@ class GradeTheSport(APIView):
     def get(self,request):
         username = request.META.get("REMOTE_USER").get("username")
         referee = Referee.objects.filter(username=username).first()
-        group_list = list(referee.group.filter(status="待打分").values("id"))
+        group_list = list(referee.group.filter(Q(status="待打分")|Q(status="重新打分")).values("id"))
         group_id = []
         for group in group_list:
             group_id.append(group.get("id"))
