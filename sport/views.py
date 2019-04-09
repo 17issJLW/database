@@ -874,7 +874,7 @@ class ConfirmGrade(APIView):
                 group_list_id.append(i["group_id"])
             group_list_id = list(set(group_list_id))
             for i in group_list_id:
-                result[i] = {}
+                result[i] = []
                 for j in data:
                     if j["group_id"] == i:
                         if result[i].__contains__(j["sport_man"]):
