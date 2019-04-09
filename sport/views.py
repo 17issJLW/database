@@ -907,7 +907,7 @@ class ConfirmGrade(APIView):
                     for k in data:
                         if k["sport_man"] == i["sport_man"] and k["group_id"] == i["group_id"]:
                             j["referee_list"].append(k)
-
+            print(result)
 
 
 
