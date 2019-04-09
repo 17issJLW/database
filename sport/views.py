@@ -916,7 +916,14 @@ class ConfirmGrade(APIView):
         score_dict = score.annotate(score_sum=Sum('grade'), score_max=Max('grade'), score_min=Min('grade'))
         score_avg = (score_dict["score_sum"]-score_dict["score_max"]-score_dict["score_min"])/ \
                     (score.count()-2) * score.count() + float(data["D"]) - float(data["P"])
-        SportManGroup.objects.filter(sid__id=data["people_id"], gid__id=data["group"])
+        sport_man_group = SportManGroup.objects.filter(sid__id=data["people_id"], gid__id=data["group"]).first()
+        if sport_man_group:
+            sport_man_group.total_grade = score_avg
+            sport_man_group.d = float(data["D"])
+            sport_man_group.p = float(data["P"])
+            sport_man_group.save()
+        else:
+            raise NotFound
         #     如果没有待审核，则该组为已确认
         if not Score.objects.filter(Q(status='待审核') | Q(status='重新打分'), group__id=data["group"] ):
             group = Group.objects.filter(pk=data["group"]).first()
@@ -951,10 +958,15 @@ class ConfirmGrade(APIView):
 
 class Rank(APIView):
 
-    def get(self,request):
-        sport_man = SportManGroup.objects.filter(gid__status="已确认").order_by("gid__id","gid__num","total_grade")
+    def get(self, request, **kwargs):
+        sport_man = SportManGroup.objects.filter(gid__status="已确认")
+        if kwargs.get("competition_id"):
+            sport_man.filter(gid__competition__id=kwargs.get("competition_id"))
+        if kwargs.get("group_id"):
+            sport_man.filter(gid__id=kwargs.get("group_id"))
+        sport_man.order_by("gid__id","gid__num","-total_grade")
         serializer = SportManGroupSerializer(sport_man, many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 

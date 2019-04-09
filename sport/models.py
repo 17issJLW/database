@@ -154,6 +154,8 @@ class SportManGroup(models.Model):
     gid = models.ForeignKey("Group",blank=True, null=True, on_delete=models.SET_NULL)
     # competition = models.ForeignKey("Competition", verbose_name="比赛项目", on_delete=models.CASCADE)
     total_grade = models.FloatField(verbose_name="最终得分", blank=True, null=True)
+    d = models.FloatField(verbose_name="奖励分", blank=True, null=True)
+    p = models.FloatField(verbose_name="惩罚分", blank=True, null=True)
 
     class Meta:
         verbose_name = '运动员比赛成绩'
