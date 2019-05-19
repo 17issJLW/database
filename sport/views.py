@@ -877,12 +877,15 @@ class ConfirmGrade(APIView):
             raise PermissionDeny
         score = Score.objects.filter(group__id=data["group"], sport_man__id=data["people_id"])
         score.update(status="已确认")
-        score_dict = score.annotate(score_sum=Sum('grade'), score_max=Max('grade'), score_min=Min('grade'))
+        # score_dict = score.annotate(score_sum=Sum('grade'), score_max=Max('grade'), score_min=Min('grade'))
+        score_max = score.aggregate(Max('grade'))["grade__max"]
+        score_sum = score.aggregate(Sum('grade'))["grade__sum"]
+        score_min = score.aggregate(Min('grade'))["grade__min"]
 
-        print(float(score_dict[0].score_sum)-float(score_dict[0].score_max)-float(score_dict[0].score_min))
+        print(score_sum-score_max-score_min)
         print((score.count() - 2) * score.count() + float(data["D"]) - float(data["P"]))
         try:
-            score_avg = (float(score_dict[0].score_sum)-float(score_dict[0].score_max)-float(score_dict[0].score_min))/ \
+            score_avg = (score_sum-score_max-score_min)/ \
                         (score.count()-2) * score.count() + float(data["D"]) - float(data["P"])
 
         except:
