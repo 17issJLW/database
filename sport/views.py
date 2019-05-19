@@ -496,7 +496,7 @@ class SportManView(APIView):
             serializer = SportManSerializer(sport_man,data=request.data)
             serializer.is_valid(raise_exception=True)
             data = serializer.save()
-            return Response(data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             raise NotFound
 
