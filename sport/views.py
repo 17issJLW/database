@@ -879,8 +879,11 @@ class ConfirmGrade(APIView):
         score.update(status="已确认")
         score_dict = score.annotate(score_sum=Sum('grade'), score_max=Max('grade'), score_min=Min('grade'))
         try:
+            print((score_dict["score_sum"]-score_dict["score_max"]-score_dict["score_min"]))
+            print((score.count()-2) * score.count() + float(data["D"]) - float(data["P"]))
             score_avg = (score_dict["score_sum"]-score_dict["score_max"]-score_dict["score_min"])/ \
                         (score.count()-2) * score.count() + float(data["D"]) - float(data["P"])
+
         except:
             raise TooLessReferee
 
