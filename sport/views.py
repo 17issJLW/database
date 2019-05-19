@@ -3,6 +3,7 @@ from rest_framework.views import APIView, status,Response
 from lib.rest_framework.util import *
 from lib.rest_framework.permissions import check_token,check_team_token,check_referee_token
 from rest_framework.pagination import PageNumberPagination
+from django.db import transaction
 from django.db.models import Avg,Min,Max,Sum,Q
 
 
@@ -865,6 +866,7 @@ class ConfirmGrade(APIView):
 
 
     @check_referee_token
+    @transaction.atomic()
     def post(self,request):
         username = request.META.get("REMOTE_USER").get("username")
         data = request.data
@@ -913,6 +915,7 @@ class ConfirmGrade(APIView):
         return Response({"message":"confirm", "score":score_avg},status=status.HTTP_200_OK)
 
     @check_referee_token
+    @transaction.atomic()
     def delete(self, request, group_id, referee_id,people_id):
         username = request.META.get("REMOTE_USER").get("username")
         leader = RefereeGroup.objects.filter(referee__username=username, group__id=group_id, is_leader=True)
