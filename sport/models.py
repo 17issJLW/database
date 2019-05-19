@@ -73,15 +73,10 @@ class SportMan(models.Model):
     sex = models.CharField(verbose_name="性别", max_length=32, default="男", choices=SEX)
     age_group = models.CharField(verbose_name="组别",default="7-8岁",choices=AGEGROUP,max_length=32)
     grade = models.FloatField(verbose_name="文化分数", blank=True, null=True)
-    team = models.ForeignKey("Team", verbose_name="所属代表队",blank=True,null=True,on_delete=models.SET_NULL,related_name='sport_man_team')
+    team = models.ForeignKey("Team", verbose_name="所属代表队",blank=True,null=True,on_delete=models.CASCADE,related_name='sport_man_team')
     number = models.IntegerField(verbose_name="运动员号码", unique=True, blank=True, null=True)
     competition_group = models.ManyToManyField("Group", verbose_name="报名分组", through='SportManGroup', through_fields=("sid", "gid"), related_name='sport_man')
 
-    # phone = models.CharField(verbose_name="手机号码", max_length=32,blank=True, null=True)
-    # team = models.ForeignKey("Team",blank=True, null=True,on_delete=models.SET_NULL)
-    # sex = models.CharField(verbose_name="性别", max_length=32,default="男", choices=SEX)
-    # age = models.IntegerField(verbose_name="年龄",blank=True, null=True)
-    # group = models.ForeignKey("Group",blank=True,null=True,on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = '运动员表'
@@ -150,8 +145,8 @@ class LeaderAndDoctor(models.Model):
 
 
 class SportManGroup(models.Model):
-    sid = models.ForeignKey("SportMan",blank=True, null=True, on_delete=models.SET_NULL)
-    gid = models.ForeignKey("Group",blank=True, null=True, on_delete=models.SET_NULL)
+    sid = models.ForeignKey("SportMan",blank=True, null=True, on_delete=models.CASCADE)
+    gid = models.ForeignKey("Group",blank=True, null=True, on_delete=models.CASCADE)
     # competition = models.ForeignKey("Competition", verbose_name="比赛项目", on_delete=models.CASCADE)
     total_grade = models.FloatField(verbose_name="最终得分", blank=True, null=True)
     d = models.FloatField(verbose_name="奖励分", blank=True, null=True)

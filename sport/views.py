@@ -493,18 +493,10 @@ class SportManView(APIView):
 
         sport_man = SportMan.objects.filter(pk=people_id, team__username=username).first()
         if sport_man:
-            serializer = SportManSerializer(data=request.data)
+            serializer = SportManSerializer(sport_man,data=request.data)
             serializer.is_valid(raise_exception=True)
-            data = serializer.validated_data
-            sport_man = SportMan.objects.create(
-                name=data.get("name"),
-                id_number=data.get("id_number"),
-                age=data.get("age"),
-                sex=data.get("sex"),
-                age_group=data.get("age_group")
-            )
-            serializer = SportManSerializer(sport_man)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            data = serializer.save()
+            return Response(data, status=status.HTTP_200_OK)
         else:
             raise NotFound
 
@@ -867,35 +859,6 @@ class ConfirmGrade(APIView):
                 group_id.append(i.group.id)
             score_list = Score.objects.filter(group__id__in=group_id).order_by("group")
             serializer = ScoreSerializer(score_list,many=True)
-            data = serializer.data
-            result = []
-            group_list_id = []
-
-            for i in data:
-                group_list_id.append(i["group_id"])
-            group_list_id = list(set(group_list_id))
-
-
-            # for i in group_list_id:
-            #     for j in data:
-            #         if j["group_id"] == i:
-            #             j["sport_man"] = []
-            #             result.append(j)
-            #             break
-            # for i in result:
-            #     sport_man = []
-            #     for j in data:
-            #         if j["group_id"] == i["group_id"]:
-            #             if j["sport_man"] not in sport_man:
-            #                 j["referee_list"] = []
-            #                 i["sport_man"].append(j)
-            #                 sport_man.append(j["sport_man"])
-            # for i in result:
-            #     for j in i["sport_man"]:
-            #         for k in data:
-            #             if k["sport_man"] == i["sport_man"] and k["group_id"] == i["group_id"]:
-            #                 j["referee_list"].append(k)
-            # print(result)
 
             return Response(serializer.data,status=status.HTTP_200_OK)
 
@@ -915,8 +878,12 @@ class ConfirmGrade(APIView):
         score = Score.objects.filter(group__id=data["group"], sport_man__id=data["people_id"])
         score.update(status="已确认")
         score_dict = score.annotate(score_sum=Sum('grade'), score_max=Max('grade'), score_min=Min('grade'))
-        score_avg = (score_dict["score_sum"]-score_dict["score_max"]-score_dict["score_min"])/ \
-                    (score.count()-2) * score.count() + float(data["D"]) - float(data["P"])
+        try:
+            score_avg = (score_dict["score_sum"]-score_dict["score_max"]-score_dict["score_min"])/ \
+                        (score.count()-2) * score.count() + float(data["D"]) - float(data["P"])
+        except:
+            raise TooLessReferee
+
         sport_man_group = SportManGroup.objects.filter(sid__id=data["people_id"], gid__id=data["group"]).first()
         if sport_man_group:
             sport_man_group.total_grade = score_avg

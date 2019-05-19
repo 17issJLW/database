@@ -24,5 +24,6 @@ urlpatterns = [
     path('jet/',include('jet.urls', 'jet')),
     path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
     path('sport/',include('sport.urls')),
+    path('screen/',include('screen.urls')),
     path('media/file/<path>', serve, {'document_root': settings.MEDIA_ROOT+"/file/"}),
 ]

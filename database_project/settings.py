@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'jet.dashboard',
     'jet',
     'django.contrib.admin',
@@ -107,6 +108,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'database_project.wsgi.application'
+
+ASGI_APPLICATION = 'database_project.routing.application'
 
 TOKEN_SECRET = "sfjsal65dfd"
 
