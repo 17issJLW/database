@@ -616,11 +616,9 @@ class ChangeGroupView(APIView):
         group_id = request_data.get("group")
         competiton_id = request_data.get("competition")
         group = Group.objects.filter(pk=group_id).first()
-        print("1")
         print(people, group_id, competiton_id)
         if not people or not group:
             raise NotFound
-        print("hhh")
         print(people,group_id,competiton_id)
         try:
             for i in people:
@@ -816,7 +814,7 @@ class GradeTheSport(APIView):
                     sport_man=sport_man,
                     grade=float(data["grade"])
                 )
-            count = Score.objects.filter(group__id=data["group"]).count()
+            count = Score.objects.filter(group__id=data["group"], status__in=["待审核", "已确认"]).count()
             referee_count = RefereeGroup.objects.filter(group__id=data["group"]).count()
             people_count = SportManGroup.objects.filter(gid__id=data["group"]).count()
             if count >= (people_count * referee_count):
